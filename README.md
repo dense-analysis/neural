@@ -5,7 +5,7 @@
 Neural is a plugin for Neovim that provides blazingly fast AI code generation, editing and completion. 
 It uses OpenAI's GPT-3 API capabilities under the hood to query machine learning models and stream results.
 
-[![Watch the video](https://img.youtube.com/vi/9mxUBqaZuQU/maxresdefault.jpg)](https://www.youtube.com/watch?v=9mxUBqaZuQU)
+https://user-images.githubusercontent.com/38880939/209406364-d1ae162a-9fb3-4e15-8dbb-4890a4db1f5d.mov
 
 ## Features
 ### ⚡ Fast generation

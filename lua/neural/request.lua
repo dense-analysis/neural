@@ -58,9 +58,18 @@ function Request.post(endpoint, body, api_key, buffer_info, on_complete)
         for data_chunk in string.gmatch(data, content_expr) do
             -- Reset newline chunk.
             newline_chunk = false
-            -- Parse escaped quotes.
-            data_chunk = string.gsub(data_chunk, '\\"', '\"')
-            data_chunk = string.gsub(data_chunk, "\\'", "'")
+            -- Parse escape sequence characters
+            data_chunk = string.gsub(data_chunk, "\\\\([0-7]{1,3}|[abfnrtv\\'\"])", {
+              ["a"] = "\a",
+              ["b"] = "\b",
+              ["f"] = "\f",
+              ["n"] = "\n",
+              ["r"] = "\r",
+              ["t"] = "\t",
+              ["v"] = "\v",
+              ["\\'"] = "'",
+              ["\\\""] = "\"",
+            })
 
             -- Add new lines from the output stream chunk.
             for _ in string.gmatch(data_chunk, '\\n') do

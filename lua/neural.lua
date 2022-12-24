@@ -111,7 +111,8 @@ local function set_mark(buffer)
         })
 
         -- Use significant to add animated sign
-        if has_significant and Config.options.ui.use_animated_sign then
+        if has_significant and Config.options.ui.use_animated_sign and start_row > 0 then
+            -- TODO: Investigate issue with extmarks and vim.api.nvim_buf_set_text(..., {'', ''})
             AnimatedSign.start_animated_sign(start_row, 'dots', 100)
         end
     end

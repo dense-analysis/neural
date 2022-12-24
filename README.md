@@ -32,8 +32,8 @@ Although the resulting output is usually syntactically valid, it must be careful
 ## 🔌 Dependencies
 - [curl](https://curl.se/) - for making HTTP requests
 - [OpenAI API](https://beta.openai.com/) - for edits/completions querying
-- [significant.nvim](https://github.com/ElPiloto/significant.nvim) (**optional**, for UI support)
-- [nui.nvim](https://github.com/MunifTanjim/nui.nvim) (**optional**, for animated signs)
+- [nui.nvim](https://github.com/MunifTanjim/nui.nvim) (**optional**, for UI support)
+- [significant.nvim](https://github.com/ElPiloto/significant.nvim) (**optional**, for animated signs)
 
 ## 🪄 Installation
 You will need to obtain an [OpenAI API key](https://beta.openai.com/signup/).

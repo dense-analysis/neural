@@ -90,8 +90,6 @@ use({
 })
 ```
 
-(NOTE: Not tested yet but should work)
-
 </details>
 
 ## 🚀 Usage

@@ -37,7 +37,7 @@ function Neural.setup(options)
     if type(options) == "table" then
         Config.setup(options)
     else
-        print('Neural: config options must be a table')
+        vim.api.nvim_err_writeln('[Neural Error]: config options must be a table')
         return
     end
 

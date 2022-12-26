@@ -141,6 +141,10 @@ function Neural.query(prompt, type, args)
 
     -- Actions after query completes.
     local function on_complete()
+        -- Emit user event that can be hooked to call linters/fixers.
+        vim.api.nvim_exec_autocmds("User", { pattern = "NeuralWritePost" })
+
+        -- Remove icons
         if Config.options.ui.show_icon or Config.options.ui.show_hl then
             if has_significant and Config.options.ui.use_animated_sign then
                 AnimatedSign.stop_animated_sign(start_row, {unplace_sign=true})

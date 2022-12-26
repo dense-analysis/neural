@@ -73,7 +73,7 @@ Then run `:PlugInstall` in Neovim to install Neural.
 <details><summary><h2>Packer.nvim</h2></summary>
 
 You can use [packer.nvim](https://github.com/wbthomason/packer.nvim) with something like:
-```
+```lua
 use({
     'dense-analysis/neural',
     config = function()
@@ -105,6 +105,14 @@ For example, to use Neural for code completion, you can type `:NeuralCode intell
 
 #### Text completion
 To use Neural for text generation, you can type `:NeuralText "The quick brown fox"` in normal mode, or press the configured keybinding in insert or visual mode and enter `"The quick brown fox"` at the prompt.
+
+
+### Events
+You can run an auto command after a neural result has finished writing to the buffer.
+This is useful for running linters and fixers, for example:
+```vim
+autocmd User NeuralWritePost ALEFix!
+```
 
 <details><summary><h3>⌨️ Example prompt shortcuts</h3></summary>
 

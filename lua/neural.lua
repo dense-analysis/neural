@@ -34,7 +34,11 @@ function NeuralPromptBorder()
 end
 
 function Neural.setup(options)
-    Config.setup(options)
+    if type(options) == "table" then
+        Config.setup(options)
+    else
+        return
+    end
 
     OpenAI.API_KEY = Config.options.open_ai.api_key
 

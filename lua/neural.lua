@@ -34,12 +34,7 @@ function NeuralPromptBorder()
 end
 
 function Neural.setup(options)
-    if type(options) == "table" then
-        Config.setup(options)
-    else
-        vim.api.nvim_err_writeln('[Neural Error]: config options must be a table')
-        return
-    end
+    Config.setup(options)
 
     OpenAI.API_KEY = Config.options.open_ai.api_key
 
@@ -232,7 +227,5 @@ function Neural.query(prompt, type, args)
         end
     end
 end
-
-Neural.setup()
 
 return Neural

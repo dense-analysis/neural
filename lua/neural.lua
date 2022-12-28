@@ -232,6 +232,4 @@ function Neural.query(prompt, type, args)
     end
 end
 
-Neural.setup()
-
 return Neural

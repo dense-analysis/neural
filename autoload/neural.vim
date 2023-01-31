@@ -38,7 +38,16 @@ function! s:AddLineToBuffer(buffer, job_data, line) abort
     let a:job_data.content_started = 1
 endfunction
 
-function! s:HandleOutputEnd(buffer) abort
+function! s:HandleOutputEnd(buffer, job_data) abort
+endfunction
+
+" Get the path to the executable for a script language.
+function! s:GetScriptExecutable(datasource) abort
+    if a:datasource.script_language is# 'python'
+        return 'python3'
+    endif
+
+    throw 'Unknown script language: ' . a:datasource.script_language
 endfunction
 
 " Escape a string suitably for each platform.
@@ -65,7 +74,7 @@ function! neural#Prompt(prompt_text) abort
         " FIXME
         lua Neural.prompt(prompt_text)
     else
-        let l:datasource = $HOME . '/git/neural/neural_datasources/openai.py'
+        let l:datasource = neural#datasource#Get(g:neural_selected_datasource)
         let l:input = {
         \   'prompt': a:prompt_text,
         \   'temperature': 0.0,
@@ -78,7 +87,9 @@ function! neural#Prompt(prompt_text) abort
             let l:neural_line -= 1
         endif
 
-        let l:command = 'python3' . ' ' . neural#Escape(l:datasource)
+        let l:script_exe = s:GetScriptExecutable(l:datasource)
+        let l:command = neural#Escape(l:script_exe)
+        \   . ' ' . neural#Escape(l:datasource.script)
         let l:command = neural#job#PrepareCommand(l:buffer, l:command)
         " In Vim pty jobs echo back the input line, so we'll skip the first
         " line of output.
@@ -88,18 +99,18 @@ function! neural#Prompt(prompt_text) abort
         \   'skip_next_line': !has('nvim'),
         \}
 
-        let l:job_options = {
+        let l:job_id = neural#job#Start(l:command, {
         \   'mode': 'nl',
         \   'out_cb': {job_id, line -> s:AddLineToBuffer(l:buffer, l:job_data, line)},
-        \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer)},
-        \}
-
-        let l:job_id = neural#job#Start(l:command, l:job_options)
+        \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer, l:job_data)},
+        \})
 
         if l:job_id > 0
             let l:stdin_data = json_encode(l:input) . "\n"
 
             call neural#job#SendRaw(l:job_id, l:stdin_data)
+        else
+            " TODO: Handle failure to start a job for Neural.
         endif
     endif
 endfunction

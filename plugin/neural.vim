@@ -29,4 +29,7 @@ if !s:has_features
     finish
 endif
 
+" The machine learning datasource to use for Neural.
+let g:neural_selected_datasource = get(g:, 'neural_selected_datasource', 'openai')
+
 command! -nargs=1 NeuralPrompt :call neural#Prompt(<q-args>)

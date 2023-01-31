@@ -1,11 +1,11 @@
+function! s:OutputErrorMessage(message) abort
+    echohl error
+    echomsg a:message
+    echohl None
+endfunction
+
 function! s:AddLineToBuffer(buffer, job_data, line) abort
     if bufnr('') isnot a:buffer
-        return
-    endif
-
-    if a:job_data.skip_next_line
-        let a:job_data.skip_next_line = 0
-
         return
     endif
 
@@ -38,7 +38,15 @@ function! s:AddLineToBuffer(buffer, job_data, line) abort
     let a:job_data.content_started = 1
 endfunction
 
-function! s:HandleOutputEnd(buffer, job_data) abort
+function! s:AddErrorLine(buffer, job_data, line) abort
+    call add(a:job_data.error_lines, a:line)
+endfunction
+
+function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
+    " Output an error message from the program if something goes wrong.
+    if a:exit_code != 0
+        call s:OutputErrorMessage(join(a:job_data.error_lines, "\n"))
+    endif
 endfunction
 
 " Get the path to the executable for a script language.
@@ -75,7 +83,15 @@ function! neural#Prompt(prompt_text) abort
         lua Neural.prompt(prompt_text)
     else
         let l:datasource = neural#datasource#Get(g:neural_selected_datasource)
+        let l:config = get(g:neural_datasource_config, l:datasource.name, {})
+
+        " If the config is not a Dictionary, throw it away.
+        if type(l:config) isnot v:t_dict
+            let l:config = {}
+        endif
+
         let l:input = {
+        \   'config': l:config,
         \   'prompt': a:prompt_text,
         \   'temperature': 0.0,
         \}
@@ -91,18 +107,17 @@ function! neural#Prompt(prompt_text) abort
         let l:command = neural#Escape(l:script_exe)
         \   . ' ' . neural#Escape(l:datasource.script)
         let l:command = neural#job#PrepareCommand(l:buffer, l:command)
-        " In Vim pty jobs echo back the input line, so we'll skip the first
-        " line of output.
         let l:job_data = {
         \   'line': l:neural_line,
+        \   'error_lines': [],
         \   'content_started': 0,
-        \   'skip_next_line': !has('nvim'),
         \}
 
         let l:job_id = neural#job#Start(l:command, {
         \   'mode': 'nl',
         \   'out_cb': {job_id, line -> s:AddLineToBuffer(l:buffer, l:job_data, line)},
-        \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer, l:job_data)},
+        \   'err_cb': {job_id, line -> s:AddErrorLine(l:buffer, l:job_data, line)},
+        \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer, l:job_data, exit_code)},
         \})
 
         if l:job_id > 0
@@ -110,7 +125,7 @@ function! neural#Prompt(prompt_text) abort
 
             call neural#job#SendRaw(l:job_id, l:stdin_data)
         else
-            " TODO: Handle failure to start a job for Neural.
+            call s:OutputErrorMessage('Failed to run ' . l:datasource.name)
         endif
     endif
 endfunction

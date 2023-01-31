@@ -31,5 +31,7 @@ endif
 
 " The machine learning datasource to use for Neural.
 let g:neural_selected_datasource = get(g:, 'neural_selected_datasource', 'openai')
+" Configure machine learning datasources, such as: {'openai': {'api_key': ...}}
+let g:neural_datasource_config = get(g:, 'neural_datasource_config', {})
 
 command! -nargs=1 NeuralPrompt :call neural#Prompt(<q-args>)

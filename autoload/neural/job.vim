@@ -223,7 +223,6 @@ function! neural#job#Start(command, options) abort
         let l:job_id = l:job_info.job
     else
         let l:job_options = {
-        \   'pty': 1,
         \   'in_mode': l:job_info.mode,
         \   'out_mode': l:job_info.mode,
         \   'err_mode': l:job_info.mode,

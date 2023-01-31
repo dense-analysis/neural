@@ -3,7 +3,6 @@ A Neural datasource for loading generated text via OpenAI.
 """
 import json
 import sys
-import os
 import urllib.request
 
 API_ENDPOINT = 'https://api.openai.com/v1/completions'
@@ -63,12 +62,12 @@ def get_openai_completion(
 
 
 def main() -> None:
-    api_key = os.environ.get("NEURAL_OPENAPI_KEY")
+    input_data = json.loads(sys.stdin.readline())
+
+    api_key = input_data["config"].get("api_key")
 
     if not api_key:
-        sys.exit("NEURAL_OPENAPI_KEY is not defined.")
-
-    input_data = json.loads(sys.stdin.readline())
+        sys.exit("config.api_key is not defined.")
 
     get_openai_completion(
         api_key,

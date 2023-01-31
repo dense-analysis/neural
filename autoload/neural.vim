@@ -1,10 +1,16 @@
-function! s:AddLineToBuffer(buffer, line) abort
+function! s:AddLineToBuffer(buffer, job_data, line) abort
     if bufnr('') isnot a:buffer
         return
     endif
 
-    let l:start_line = getbufvar(a:buffer, 'neural_line')
-    let l:started = getbufvar(a:buffer, 'neural_content_started')
+    if a:job_data.skip_next_line
+        let a:job_data.skip_next_line = 0
+
+        return
+    endif
+
+    let l:start_line = a:job_data.line
+    let l:started = a:job_data.content_started
 
     " Skip introductory empty lines.
     if !l:started && len(a:line) == 0
@@ -28,13 +34,11 @@ function! s:AddLineToBuffer(buffer, line) abort
         call setpos('.', l:pos)
     endif
 
-    call setbufvar(a:buffer, 'neural_line', l:start_line + 1)
-    call setbufvar(a:buffer, 'neural_content_started', 1)
+    let a:job_data.line = l:start_line + 1
+    let a:job_data.content_started = 1
 endfunction
 
 function! s:HandleOutputEnd(buffer) abort
-    let l:vars = getbufvar(a:buffer, '')
-    call remove(l:vars, 'neural_line')
 endfunction
 
 " Escape a string suitably for each platform.
@@ -68,29 +72,34 @@ function! neural#Prompt(prompt_text) abort
         \}
 
         let l:buffer = bufnr('')
-        let l:command = 'python3'
-        \   . ' ' . neural#Escape(l:datasource)
-        \   . ' ' . neural#Escape(json_encode(l:input))
-        let l:command = neural#job#PrepareCommand(l:buffer, l:command)
-
-        let l:job_options = {
-        \   'mode': 'nl',
-        \   'out_cb': {job_id, line -> s:AddLineToBuffer(l:buffer, line)},
-        \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer)},
-        \}
-
         let l:neural_line = getpos('.')[1]
 
         if len(getline(l:neural_line)) == 0
             let l:neural_line -= 1
         endif
 
-        call setbufvar(l:buffer, 'neural_line', l:neural_line)
-        call setbufvar(l:buffer, 'neural_content_started', 0)
+        let l:command = 'python3' . ' ' . neural#Escape(l:datasource)
+        let l:command = neural#job#PrepareCommand(l:buffer, l:command)
+        " In Vim pty jobs echo back the input line, so we'll skip the first
+        " line of output.
+        let l:job_data = {
+        \   'line': l:neural_line,
+        \   'content_started': 0,
+        \   'skip_next_line': !has('nvim'),
+        \}
+
+        let l:job_options = {
+        \   'mode': 'nl',
+        \   'out_cb': {job_id, line -> s:AddLineToBuffer(l:buffer, l:job_data, line)},
+        \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer)},
+        \}
+
         let l:job_id = neural#job#Start(l:command, l:job_options)
 
-        " FIXME: Handle failure
-        if l:job_id == 0
+        if l:job_id > 0
+            let l:stdin_data = json_encode(l:input) . "\n"
+
+            call neural#job#SendRaw(l:job_id, l:stdin_data)
         endif
     endif
 endfunction

@@ -68,7 +68,7 @@ def main() -> None:
     if not api_key:
         sys.exit("NEURAL_OPENAPI_KEY is not defined.")
 
-    input_data = json.loads(sys.argv[1])
+    input_data = json.loads(sys.stdin.readline())
 
     get_openai_completion(
         api_key,

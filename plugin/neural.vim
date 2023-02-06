@@ -35,3 +35,6 @@ let g:neural_selected_datasource = get(g:, 'neural_selected_datasource', 'openai
 let g:neural_datasource_config = get(g:, 'neural_datasource_config', {})
 
 command! -nargs=1 NeuralPrompt :call neural#Prompt(<q-args>)
+
+" <Plug> mappings for commands
+nnoremap <Plug>(neural_prompt) :NeuralPrompt<Space>

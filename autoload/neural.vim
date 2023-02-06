@@ -1,7 +1,23 @@
 function! s:OutputErrorMessage(message) abort
-    echohl error
-    echomsg a:message
-    echohl None
+    let l:lines = split(a:message, '\v\r\n|\n|\r')
+
+    if len(l:lines) > 0
+        if len(l:lines) > 1
+            " Add a message to say to look at a long error if there's more
+            " than 1 error line.
+            call add(l:lines, 'Neural hit a snag! Type :mes to see why')
+        endif
+
+        echohl error
+
+        try
+            for l:line in l:lines
+                echomsg l:line
+            endfor
+        finally
+            echohl None
+        endtry
+    endif
 endfunction
 
 function! s:AddLineToBuffer(buffer, job_data, line) abort
@@ -46,6 +62,8 @@ function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
     " Output an error message from the program if something goes wrong.
     if a:exit_code != 0
         call s:OutputErrorMessage(join(a:job_data.error_lines, "\n"))
+    else
+        echomsg 'Neural is done!'
     endif
 endfunction
 
@@ -127,5 +145,16 @@ function! neural#Prompt(prompt_text) abort
         else
             call s:OutputErrorMessage('Failed to run ' . l:datasource.name)
         endif
+
+        " TODO: Set a timer and check if the job is still running.
+        "       if the job is still running after some time, print another
+        "       friendly message explaining that we're still waiting for
+        "       the first message to come through.
+        "
+        "       Maybe print a different message if we're buffering a response
+        "       the user can't see yet, which still makes sense when we make
+        "       it print the results live. Maybe users will want to disable
+        "       the 'cool' printing of messages in any case.
+        echomsg 'Neural is working, please wait...'
     endif
 endfunction

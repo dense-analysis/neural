@@ -3,6 +3,7 @@ A Neural datasource for loading generated text via OpenAI.
 """
 import json
 import sys
+import urllib.error
 import urllib.request
 
 API_ENDPOINT = 'https://api.openai.com/v1/completions'
@@ -69,11 +70,17 @@ def main() -> None:
     if not api_key:
         sys.exit("config.api_key is not defined.")
 
-    get_openai_completion(
-        api_key,
-        input_data["prompt"],
-        input_data["temperature"],
-    )
+    try:
+        get_openai_completion(
+            api_key,
+            input_data["prompt"],
+            input_data["temperature"],
+        )
+    except urllib.error.URLError as error:
+        if isinstance(error, urllib.error.HTTPError) and error.code == 429:
+            sys.exit("Neural error: OpenAI request limit reached!")
+        else:
+            raise
 
 if __name__ == "__main__":  # pragma: no cover
     main()  # pragma: no cover

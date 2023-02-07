@@ -74,6 +74,8 @@ function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
     if a:exit_code != 0
         call s:OutputErrorMessage(join(a:job_data.error_lines, "\n"))
     else
+        " Signal Neural is done for plugin integration.
+        silent doautocmd <nomodeline> User NeuralWritePost
         echomsg 'Neural is done!'
     endif
 endfunction

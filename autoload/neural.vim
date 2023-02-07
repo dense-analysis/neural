@@ -19,13 +19,16 @@ function! s:OutputErrorMessage(message) abort
             call add(l:lines, 'Neural hit a snag! Type :mes to see why')
         endif
 
+        " no-custom-checks
         echohl error
 
         try
             for l:line in l:lines
+                " no-custom-checks
                 echomsg l:line
             endfor
         finally
+            " no-custom-checks
             echohl None
         endtry
     endif
@@ -76,6 +79,7 @@ function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
     else
         " Signal Neural is done for plugin integration.
         silent doautocmd <nomodeline> User NeuralWritePost
+        " no-custom-checks
         echomsg 'Neural is done!'
     endif
 endfunction
@@ -170,5 +174,7 @@ function! neural#Prompt(prompt_text) abort
     "       the user can't see yet, which still makes sense when we make
     "       it print the results live. Maybe users will want to disable
     "       the 'cool' printing of messages in any case.
+    "
+    " no-custom-checks
     echomsg 'Neural is working, please wait...'
 endfunction

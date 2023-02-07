@@ -1,3 +1,14 @@
+" Author: Anexon <anexon@protonmail.com>, w0rp <devw0rp@gmail.com>
+" Description: The main autoload file for the Neural Vim plugin
+
+" The location of Neural datasource scripts
+let s:neural_script_dir = expand('<sfile>:p:h:h') . '/neural_datasources'
+
+" Get the Neural scripts directory in a way that makes it hard to modify.
+function! neural#GetScriptDir() abort
+    return s:neural_script_dir
+endfunction
+
 function! s:OutputErrorMessage(message) abort
     let l:lines = split(a:message, '\v\r\n|\n|\r')
 
@@ -96,7 +107,13 @@ function! neural#Escape(str) abort
 endfunction
 
 function! neural#Prompt(prompt_text) abort
-    let l:datasource = neural#datasource#Get(g:neural_selected_datasource)
+    " TODO: Print a message if the function cannot be loaded.
+    let l:GetDatasource = function(
+    \   'neural#datasource#'
+    \   . g:neural_selected_datasource
+    \   . '#Get'
+    \)
+    let l:datasource = l:GetDatasource()
     let l:config = get(g:neural_datasource_config, l:datasource.name, {})
 
     " If the config is not a Dictionary, throw it away.

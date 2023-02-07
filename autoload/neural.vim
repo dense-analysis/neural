@@ -96,65 +96,60 @@ function! neural#Escape(str) abort
 endfunction
 
 function! neural#Prompt(prompt_text) abort
-    if has('nvim')
-        " FIXME
-        lua Neural.prompt(prompt_text)
-    else
-        let l:datasource = neural#datasource#Get(g:neural_selected_datasource)
-        let l:config = get(g:neural_datasource_config, l:datasource.name, {})
+    let l:datasource = neural#datasource#Get(g:neural_selected_datasource)
+    let l:config = get(g:neural_datasource_config, l:datasource.name, {})
 
-        " If the config is not a Dictionary, throw it away.
-        if type(l:config) isnot v:t_dict
-            let l:config = {}
-        endif
-
-        let l:input = {
-        \   'config': l:config,
-        \   'prompt': a:prompt_text,
-        \   'temperature': 0.0,
-        \}
-
-        let l:buffer = bufnr('')
-        let l:neural_line = getpos('.')[1]
-
-        if len(getline(l:neural_line)) == 0
-            let l:neural_line -= 1
-        endif
-
-        let l:script_exe = s:GetScriptExecutable(l:datasource)
-        let l:command = neural#Escape(l:script_exe)
-        \   . ' ' . neural#Escape(l:datasource.script)
-        let l:command = neural#job#PrepareCommand(l:buffer, l:command)
-        let l:job_data = {
-        \   'line': l:neural_line,
-        \   'error_lines': [],
-        \   'content_started': 0,
-        \}
-
-        let l:job_id = neural#job#Start(l:command, {
-        \   'mode': 'nl',
-        \   'out_cb': {job_id, line -> s:AddLineToBuffer(l:buffer, l:job_data, line)},
-        \   'err_cb': {job_id, line -> s:AddErrorLine(l:buffer, l:job_data, line)},
-        \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer, l:job_data, exit_code)},
-        \})
-
-        if l:job_id > 0
-            let l:stdin_data = json_encode(l:input) . "\n"
-
-            call neural#job#SendRaw(l:job_id, l:stdin_data)
-        else
-            call s:OutputErrorMessage('Failed to run ' . l:datasource.name)
-        endif
-
-        " TODO: Set a timer and check if the job is still running.
-        "       if the job is still running after some time, print another
-        "       friendly message explaining that we're still waiting for
-        "       the first message to come through.
-        "
-        "       Maybe print a different message if we're buffering a response
-        "       the user can't see yet, which still makes sense when we make
-        "       it print the results live. Maybe users will want to disable
-        "       the 'cool' printing of messages in any case.
-        echomsg 'Neural is working, please wait...'
+    " If the config is not a Dictionary, throw it away.
+    if type(l:config) isnot v:t_dict
+        let l:config = {}
     endif
+
+    let l:input = {
+    \   'config': l:config,
+    \   'prompt': a:prompt_text,
+    \   'temperature': 0.0,
+    \}
+
+    let l:buffer = bufnr('')
+    let l:neural_line = getpos('.')[1]
+
+    if len(getline(l:neural_line)) == 0
+        let l:neural_line -= 1
+    endif
+
+    let l:script_exe = s:GetScriptExecutable(l:datasource)
+    let l:command = neural#Escape(l:script_exe)
+    \   . ' ' . neural#Escape(l:datasource.script)
+    let l:command = neural#job#PrepareCommand(l:buffer, l:command)
+    let l:job_data = {
+    \   'line': l:neural_line,
+    \   'error_lines': [],
+    \   'content_started': 0,
+    \}
+
+    let l:job_id = neural#job#Start(l:command, {
+    \   'mode': 'nl',
+    \   'out_cb': {job_id, line -> s:AddLineToBuffer(l:buffer, l:job_data, line)},
+    \   'err_cb': {job_id, line -> s:AddErrorLine(l:buffer, l:job_data, line)},
+    \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer, l:job_data, exit_code)},
+    \})
+
+    if l:job_id > 0
+        let l:stdin_data = json_encode(l:input) . "\n"
+
+        call neural#job#SendRaw(l:job_id, l:stdin_data)
+    else
+        call s:OutputErrorMessage('Failed to run ' . l:datasource.name)
+    endif
+
+    " TODO: Set a timer and check if the job is still running.
+    "       if the job is still running after some time, print another
+    "       friendly message explaining that we're still waiting for
+    "       the first message to come through.
+    "
+    "       Maybe print a different message if we're buffering a response
+    "       the user can't see yet, which still makes sense when we make
+    "       it print the results live. Maybe users will want to disable
+    "       the 'cool' printing of messages in any case.
+    echomsg 'Neural is working, please wait...'
 endfunction

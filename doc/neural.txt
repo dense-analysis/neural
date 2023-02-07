@@ -1,0 +1,100 @@
+*neural.txt* Plugin to generate text and code with machine learning.
+*neural*
+
+===============================================================================
+CONTENTS                                                      *neural-contents*
+
+  1. Introduction.........................|neural-introduction|
+  2. Supported Tools......................|neural-support|
+  3. Options..............................|neural-options|
+  4. Commands/Keybinds....................|neural-commands|
+  5. API..................................|neural-api|
+  6. Contact..............................|neural-contact|
+
+===============================================================================
+1. Introduction                                           *neural-introduction*
+
+Neural is a plugin for Vim and Neovim that provides blazingly fast AI code
+generation, editing, and completion.
+
+It uses machine learning tools under the hood, such as OpenAI's GPT-3 API, to
+generate text, code, and much more.
+
+===============================================================================
+2. Supported Languages & Tools                                 *neural-support*
+
+Neural supports the following tools.
+
+1. OpenAI - https://beta.openai.com/signup/
+
+To select the tool that Neural will use, set |g:neural_selected_datasource|
+to the appropriate value. OpenAI is the default data source.
+
+===============================================================================
+3. Options                                                     *neural-options*
+
+g:neural_datasource_config                         *g:neural_datasource_config*
+
+  Type: |Dictionary|
+  Default: `{}`
+
+  Used for configuring settings for datasources, such as API keys. For
+  example: >
+
+  let g:neural_datasource_config = {
+  \   'openai': {
+  \       'api_key': 'sk-...',
+  \   },
+  \}
+<
+
+g:neural_selected_datasource                     *g:neural_selected_datasource*
+
+  Type: |String|
+  Default: `'openai'`
+
+  Selects a datasource for Neural to use. Possible values are:
+
+  1. `'openai'` - OpenAI
+
+
+===============================================================================
+4. Commands/Keybinds                                          *neural-commands*
+
+
+NeuralPrompt                                                     *NeuralPrompt*
+
+  Prompt Neural for a response. e.g. `:NeuralPrompt say hello`
+
+  A plug mapping `<Plug>(neural_prompt)` is defined for this command.
+
+  A |NeuralWritePost| event will be fired whenever Neural successfully
+  completes writing text to a buffer.
+
+
+===============================================================================
+5. API                                                             *neural-api*
+
+NeuralWritePost                                       *NeuralWritePost-autocmd*
+                                                              *NeuralWritePost*
+
+  An event that fires whenever Neural successfully completes writing text to a
+  buffer. This event can be used to trigger other commands on files, such as
+  automatically fixing generated code with ALE. >
+
+  augroup NeuralEvents
+      autocmd!
+      autocmd User NeuralWritePost ALEFix!
+  augroup END
+<
+
+===============================================================================
+5. Contact                                                     *neural-contact*
+
+If you like this plugin, and wish to get in touch, check out the GitHub
+page for issues and more at https://github.com/dense-analysis/neural
+
+Machines should work; people should think.
+
+===============================================================================
+  vim:tw=78:ts=2:sts=2:sw=2:ft=help:norl:

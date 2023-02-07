@@ -132,7 +132,10 @@ You can run an auto command after a Neural result has finished writing to the
 buffer. This is useful for running linters and fixers, for example:
 
 ```vim
-autocmd User NeuralWritePost ALEFix!
+augroup NeuralEvents
+    autocmd!
+    autocmd User NeuralWritePost ALEFix!
+augroup END
 ```
 
 ## 📜 Acknowledgements

@@ -66,6 +66,11 @@ NeuralPrompt                                                     *NeuralPrompt*
 
   Prompt Neural for a response. e.g. `:NeuralPrompt say hello`
 
+  If the command is run with no text input and `nui.vim` is installed, a fancy
+  UI for entering the prompt will be shown.
+
+  See https://github.com/MunifTanjim/nui.nvim for installation instructions.
+
   A plug mapping `<Plug>(neural_prompt)` is defined for this command.
 
   A |NeuralWritePost| event will be fired whenever Neural successfully

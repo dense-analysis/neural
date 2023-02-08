@@ -24,6 +24,7 @@ function! s:OutputErrorMessage(message) abort
 
         try
             for l:line in l:lines
+                " FIXME: This can cause "Press Enter to continue..."
                 " no-custom-checks
                 echomsg l:line
             endfor
@@ -79,6 +80,7 @@ function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
     else
         " Signal Neural is done for plugin integration.
         silent doautocmd <nomodeline> User NeuralWritePost
+        " FIXME: This can cause "Press Enter to continue..."
         " no-custom-checks
         echomsg 'Neural is done!'
     endif
@@ -112,7 +114,36 @@ function! neural#Escape(str) abort
     return shellescape (a:str)
 endfunction
 
+function! neural#ComplainNoPromptText() abort
+    call s:OutputErrorMessage('No prompt text!')
+endfunction
+
+function! neural#OpenPrompt() abort
+    if has('nvim')
+        " In Neovim, try to use the fancy prompt UI, if we can.
+        lua require('neural').prompt()
+    else
+        call feedkeys(':NeuralPrompt ')
+    endif
+endfunction
+
+function! neural#ComplainNoPromptText() abort
+    call s:OutputErrorMessage('No prompt text!')
+endfunction
+
 function! neural#Prompt(prompt_text) abort
+    if empty(a:prompt_text)
+        if has('nvim')
+            " FIXME: The prompt in Neovim can keep opening again and again
+            "        if the UI plugin is not installed.
+            call neural#OpenPrompt()
+        else
+            call s:OutputErrorMessage('No prompt text!')
+
+            return
+        endif
+    endif
+
     " TODO: Print a message if the function cannot be loaded.
     let l:GetDatasource = function(
     \   'neural#datasource#'
@@ -174,6 +205,8 @@ function! neural#Prompt(prompt_text) abort
     "       the user can't see yet, which still makes sense when we make
     "       it print the results live. Maybe users will want to disable
     "       the 'cool' printing of messages in any case.
+    "
+    " FIXME: This can cause "Press Enter to continue..."
     "
     " no-custom-checks
     echomsg 'Neural is working, please wait...'

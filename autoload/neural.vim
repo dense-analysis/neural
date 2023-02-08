@@ -40,7 +40,7 @@ function! s:AddLineToBuffer(buffer, job_data, line) abort
         return
     endif
 
-    let l:start_line = a:job_data.line
+    let l:moving_line = a:job_data.moving_line
     let l:started = a:job_data.content_started
 
     " Skip introductory empty lines.
@@ -58,14 +58,14 @@ function! s:AddLineToBuffer(buffer, job_data, line) abort
         let l:move_up = 1
     endif
 
-    call append(l:start_line, a:line)
+    call append(l:moving_line, a:line)
 
     " Move the cursor back up again to make content appear below.
     if l:move_up
         call setpos('.', l:pos)
     endif
 
-    let a:job_data.line = l:start_line + 1
+    let a:job_data.moving_line = l:moving_line + 1
     let a:job_data.content_started = 1
 endfunction
 
@@ -74,6 +74,12 @@ function! s:AddErrorLine(buffer, job_data, line) abort
 endfunction
 
 function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
+    let l:request_line = a:job_data.request_line
+
+    if has('nvim')
+        execute 'lua require(''neural'').stop_animated_sign(' . l:request_line . ')'
+    endif
+
     " Output an error message from the program if something goes wrong.
     if a:exit_code != 0
         call s:OutputErrorMessage(join(a:job_data.error_lines, "\n"))
@@ -137,6 +143,8 @@ function! neural#Prompt(prompt_text) abort
             " FIXME: The prompt in Neovim can keep opening again and again
             "        if the UI plugin is not installed.
             call neural#OpenPrompt()
+
+            return
         else
             call s:OutputErrorMessage('No prompt text!')
 
@@ -165,10 +173,11 @@ function! neural#Prompt(prompt_text) abort
     \}
 
     let l:buffer = bufnr('')
-    let l:neural_line = getpos('.')[1]
+    let l:request_line = getpos('.')[1]
+    let l:moving_line = getpos('.')[1]
 
-    if len(getline(l:neural_line)) == 0
-        let l:neural_line -= 1
+    if len(getline(l:moving_line)) == 0
+        let l:moving_line -= 1
     endif
 
     let l:script_exe = s:GetScriptExecutable(l:datasource)
@@ -176,7 +185,8 @@ function! neural#Prompt(prompt_text) abort
     \   . ' ' . neural#Escape(l:datasource.script)
     let l:command = neural#job#PrepareCommand(l:buffer, l:command)
     let l:job_data = {
-    \   'line': l:neural_line,
+    \   'request_line': l:request_line,
+    \   'moving_line': l:moving_line,
     \   'error_lines': [],
     \   'content_started': 0,
     \}
@@ -210,4 +220,8 @@ function! neural#Prompt(prompt_text) abort
     "
     " no-custom-checks
     echomsg 'Neural is working, please wait...'
+
+    if has('nvim')
+        execute 'lua require(''neural'').start_animated_sign(' . l:request_line . ')'
+    endif
 endfunction

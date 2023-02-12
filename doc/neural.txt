@@ -110,20 +110,11 @@ g:neural.ui.animated_sign_enabled           *g:neural.ui.animated_sign_enabled*
   Available in Neovim only with `significant.nvim` installed.
 
 
-g:neural.ui.animated_sign_enabled           *g:neural.ui.animated_sign_enabled*
-                                        *vim.g.neural.ui.animated_sign_enabled*
-  Type: |Boolean|
-  Default: `v:true`
-
-  If `v:true`, show animated signs when Neural is working.
-
-  Available in Neovim only with `significant.nvim` installed.
-
-
 -------------------------------------------------------------------------------
 3.1 OpenAI                                                      *neural-openai*
 
 Options for configuring OpenAI are listed below.
+
 
 g:neural.source.openai.api_key                 *g:neural.source.openai.api_key*
                                            *vim.g.neural.source.openai.api_key*
@@ -131,6 +122,44 @@ g:neural.source.openai.api_key                 *g:neural.source.openai.api_key*
   Default: `''`
 
   The OpenAI API key. See: https://beta.openai.com/signup/
+
+
+g:neural.source.openai.frequency_penalty
+                                     *g:neural.source.openai.frequency_penalty*
+                                 *vim.g.neural.source.openai.frequency_penalty*
+  Type: |Number| or |Float|
+  Default: `0.1`
+
+  Number between `-2.0` and `2.0`.
+  Positive values penalize new tokens based on their existing frequency in the
+  output so far, decreasing the likelihood to repeat the same line verbatim.
+
+  See: https://platform.openai.com/docs/api-reference/parameter-details
+
+
+g:neural.source.openai.max_tokens           *g:neural.source.openai.max_tokens*
+                                        *vim.g.neural.source.openai.max_tokens*
+  Type: |Number|
+  Default: `1024`
+
+  The maximum number of tokens to generate in the output.
+  One token generally corresponds to `~4` characters for common English text.
+
+  This translates to roughly `¾` of a word (e.g. `100 tokens ~= 75 words`).
+
+
+g:neural.source.openai.presence_penalty
+                                      *g:neural.source.openai.presence_penalty*
+                                  *vim.g.neural.source.openai.presence_penalty*
+  Type: |Number| or |Float|
+  Default: `0.1`
+
+  Number between `-2.0` and `2.0`.
+
+  Positive values penalize new tokens based on whether they appear in the text
+  so far, increasing the model's likelihood to talk about new topics.
+
+  See: https://platform.openai.com/docs/api-reference/parameter-details
 
 
 g:neural.source.openai.temperature         *g:neural.source.openai.temperature*
@@ -159,43 +188,6 @@ g:neural.source.openai.top_p                     *g:neural.source.openai.top_p*
 
   OpenAI recommends altering this or temperature but not both.
 
-
-g:neural.source.openai.max_tokens           *g:neural.source.openai.max_tokens*
-                                        *vim.g.neural.source.openai.max_tokens*
-  Type: |Number|
-  Default: `1024`
-
-  The maximum number of tokens to generate in the output.
-  One token generally corresponds to `~4` characters for common English text.
-
-  This translates to roughly `¾` of a word (e.g. `100 tokens ~= 75 words`).
-
-
-g:neural.source.openai.presence_penalty
-                                      *g:neural.source.openai.presence_penalty*
-                                  *vim.g.neural.source.openai.presence_penalty*
-  Type: |Number| or |Float|
-  Default: `0.1`
-
-  Number between `-2.0` and `2.0`.
-
-  Positive values penalize new tokens based on whether they appear in the text
-  so far, increasing the model's likelihood to talk about new topics.
-
-  See: https://platform.openai.com/docs/api-reference/parameter-details
-
-
-g:neural.source.openai.frequency_penalty
-                                     *g:neural.source.openai.frequency_penalty*
-                                 *vim.g.neural.source.openai.frequency_penalty*
-  Type: |Number| or |Float|
-  Default: `0.1`
-
-  Number between `-2.0` and `2.0`.
-  Positive values penalize new tokens based on their existing frequency in the
-  output so far, decreasing the likelihood to repeat the same line verbatim.
-
-  See: https://platform.openai.com/docs/api-reference/parameter-details
 
 ===============================================================================
 4. Commands/Keybinds                                          *neural-commands*

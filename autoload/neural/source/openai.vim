@@ -3,7 +3,7 @@
 
 let s:script_dir = neural#GetScriptDir()
 
-function! neural#datasource#openai#Get() abort
+function! neural#source#openai#Get() abort
     return {
     \   'name': 'openai',
     \   'script_language': 'python',

@@ -1,5 +1,4 @@
 local next = next
-local Config = require('neural.config')
 
 -- External dependencies
 local UI = {}
@@ -17,21 +16,15 @@ end
 
 local Neural = {}
 
-local function ensure_configured()
-    -- Set up the default config if not otherwise configured.
-    if next(Config.options) == nil then
-        Config.setup({})
-    end
-end
-
-function Neural.setup(options)
-    Config.setup(options)
+function Neural.setup(settings)
+    -- Call the Vim script function to set up the shared configuration.
+    vim.fn['neural#config#Set'](settings)
 end
 
 function Neural.prompt()
-    ensure_configured()
+    local prompt_enabled = vim.g.neural.ui.prompt_enabled
 
-    if has_nui and Config.options.ui.use_prompt then
+    if has_nui and (prompt_enabled and prompt_enabled ~= 0) then
         UI.prompt(
             ' Neural ',
             function(value)
@@ -48,17 +41,17 @@ function Neural.prompt()
 end
 
 function Neural.start_animated_sign(line)
-    ensure_configured()
+    local sign_enabled = vim.g.neural.ui.animated_sign_enabled
 
-    if has_significant and Config.options.ui.use_animated_sign and line > 0 then
+    if has_significant and (sign_enabled and sign_enabled ~= 0) and line > 0 then
         AnimatedSign.start_animated_sign(line, 'dots', 100)
     end
 end
 
 function Neural.stop_animated_sign(line)
-    ensure_configured()
+    local sign_enabled = vim.g.neural.ui.animated_sign_enabled
 
-    if has_significant and Config.options.ui.use_animated_sign and line > 0 then
+    if has_significant and (sign_enabled and sign_enabled ~= 0) and line > 0 then
         AnimatedSign.stop_animated_sign(line, {unplace_sign=true})
     end
 end

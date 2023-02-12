@@ -7,6 +7,7 @@ CONTENTS                                                      *neural-contents*
   1. Introduction.........................|neural-introduction|
   2. Supported Tools......................|neural-support|
   3. Options..............................|neural-options|
+    3.1 OpenAI............................|neural-openai|
   4. Commands/Keybinds....................|neural-commands|
   5. API..................................|neural-api|
   6. Contact..............................|neural-contact|
@@ -27,35 +28,117 @@ Neural supports the following tools.
 
 1. OpenAI - https://beta.openai.com/signup/
 
-To select the tool that Neural will use, set |g:neural_selected_datasource|
-to the appropriate value. OpenAI is the default data source.
+To select the tool that Neural will use, set |g:neural.selected| to the
+appropriate value. OpenAI is the default data source.
 
 ===============================================================================
 3. Options                                                     *neural-options*
+                                                                     *g:neural*
 
-g:neural_datasource_config                         *g:neural_datasource_config*
+All of Neural's options are controlled with a single dictionary that can be
+configured either in Vim or in Lua.
 
-  Type: |Dictionary|
-  Default: `{}`
+In Vim just set `g:neural`: >
 
-  Used for configuring settings for datasources, such as API keys. For
-  example: >
-
-  let g:neural_datasource_config = {
-  \   'openai': {
-  \       'api_key': 'sk-...',
+  let g:neural = {
+  \   'source': {
+  \       'openai': {
+  \           'api_key': $OPENAI_API_KEY,
+  \       },
   \   },
   \}
 <
+In a Neovim `init.lua` call `require('neural').setup`: >
 
-g:neural_selected_datasource                     *g:neural_selected_datasource*
+  require('neural').setup({
+      ui = {
+          animated_sign_enabled = false,
+      },
+      source = {
+          openai = {
+              api_key = vim.env.OPENAI_API_KEY,
+          },
+      },
+  })
+<
 
+You can modify settings at any time, before or after Neural is loaded, and
+Neural will react to the change in settings. A complete list of supported
+options listed below.
+
+-------------------------------------------------------------------------------
+
+g:neural.selected                                           *g:neural.selected*
+                                                        *vim.g.neural.selected*
   Type: |String|
   Default: `'openai'`
 
-  Selects a datasource for Neural to use. Possible values are:
+  Selects a source for Neural to use. Possible values are:
 
   1. `'openai'` - OpenAI
+
+
+g:neural.ui.prompt_enabled                         *g:neural.ui.prompt_enabled*
+                                               *vim.g.neural.ui.prompt_enabled*
+  Type: |Boolean|
+  Default: `v:true`
+
+  If `v:true`, show a fancy prompt.
+
+  Available in Neovim only with `nui.nvim` installed.
+
+  The icon can be changed with |g:neural.ui.prompt_icon|.
+
+
+g:neural.ui.prompt_icon                               *g:neural.ui.prompt_icon*
+                                                  *vim.g.neural.ui.prompt_icon*
+  Type: |String|
+  Default: `'🗲'`
+
+  Set the icon Neural uses in the Neovim animated prompt.
+
+  See also: |g:neural.ui.prompt_enabled|.
+
+
+g:neural.ui.animated_sign_enabled           *g:neural.ui.animated_sign_enabled*
+                                        *vim.g.neural.ui.animated_sign_enabled*
+  Type: |Boolean|
+  Default: `v:true`
+
+  If `v:true`, show animated signs when Neural is working.
+
+  Available in Neovim only with `significant.nvim` installed.
+
+
+g:neural.ui.animated_sign_enabled           *g:neural.ui.animated_sign_enabled*
+                                        *vim.g.neural.ui.animated_sign_enabled*
+  Type: |Boolean|
+  Default: `v:true`
+
+  If `v:true`, show animated signs when Neural is working.
+
+  Available in Neovim only with `significant.nvim` installed.
+
+
+-------------------------------------------------------------------------------
+3.1 OpenAI                                                      *neural-openai*
+
+Options for configuring OpenAI are listed below.
+
+g:neural.source.openai.api_key                 *g:neural.source.openai.api_key*
+                                           *vim.g.neural.source.openai.api_key*
+  Type: |String|
+  Default: `''`
+
+  The OpenAI API key. See: https://beta.openai.com/signup/
+
+
+g:neural.source.openai.temperature         *g:neural.source.openai.temperature*
+                                       *vim.g.neural.source.openai.temperature*
+  Type: |Number| or |Float|
+  Default: `''`
+
+  The OpenAI temperature.
 
 
 ===============================================================================

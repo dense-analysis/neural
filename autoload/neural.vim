@@ -1,8 +1,8 @@
 " Author: Anexon <anexon@protonmail.com>, w0rp <devw0rp@gmail.com>
 " Description: The main autoload file for the Neural Vim plugin
 
-" The location of Neural datasource scripts
-let s:neural_script_dir = expand('<sfile>:p:h:h') . '/neural_datasources'
+" The location of Neural source scripts
+let s:neural_script_dir = expand('<sfile>:p:h:h') . '/neural_sources'
 
 " Get the Neural scripts directory in a way that makes it hard to modify.
 function! neural#GetScriptDir() abort
@@ -93,12 +93,12 @@ function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
 endfunction
 
 " Get the path to the executable for a script language.
-function! s:GetScriptExecutable(datasource) abort
-    if a:datasource.script_language is# 'python'
+function! s:GetScriptExecutable(source) abort
+    if a:source.script_language is# 'python'
         return 'python3'
     endif
 
-    throw 'Unknown script language: ' . a:datasource.script_language
+    throw 'Unknown script language: ' . a:source.script_language
 endfunction
 
 " Escape a string suitably for each platform.
@@ -138,40 +138,38 @@ function! neural#ComplainNoPromptText() abort
 endfunction
 
 function! neural#Prompt(prompt_text) abort
-    if empty(a:prompt_text)
-        if has('nvim')
-            " FIXME: The prompt in Neovim can keep opening again and again
-            "        if the UI plugin is not installed.
-            call neural#OpenPrompt()
+    " Reload the Neural config on a prompt request if needed.
+    call neural#config#Load()
 
-            return
+    if empty(a:prompt_text)
+        if has('nvim') && g:neural.ui.prompt_enabled
+            call neural#OpenPrompt()
         else
             call s:OutputErrorMessage('No prompt text!')
-
-            return
         endif
+
+        return
     endif
 
-    " TODO: Print a message if the function cannot be loaded.
-    let l:GetDatasource = function(
-    \   'neural#datasource#'
-    \   . g:neural_selected_datasource
-    \   . '#Get'
-    \)
-    let l:datasource = l:GetDatasource()
-    let l:config = get(g:neural_datasource_config, l:datasource.name, {})
+    let l:selected = g:neural.selected
+    let l:GetDatasource = function('neural#source#' . selected . '#Get')
+
+    try
+        let l:source = l:GetDatasource()
+    catch /E117/
+        call s:OutputErrorMessage('Invalid source: ' . l:selected)
+
+        return
+    endtry
+
+    let l:config = get(g:neural.source, l:source.name, {})
 
     " If the config is not a Dictionary, throw it away.
     if type(l:config) isnot v:t_dict
         let l:config = {}
     endif
 
-    let l:input = {
-    \   'config': l:config,
-    \   'prompt': a:prompt_text,
-    \   'temperature': 0.0,
-    \}
-
+    let l:input = {'config': l:config, 'prompt': a:prompt_text}
     let l:buffer = bufnr('')
     let l:request_line = getpos('.')[1]
     let l:moving_line = getpos('.')[1]
@@ -180,9 +178,9 @@ function! neural#Prompt(prompt_text) abort
         let l:moving_line -= 1
     endif
 
-    let l:script_exe = s:GetScriptExecutable(l:datasource)
+    let l:script_exe = s:GetScriptExecutable(l:source)
     let l:command = neural#Escape(l:script_exe)
-    \   . ' ' . neural#Escape(l:datasource.script)
+    \   . ' ' . neural#Escape(l:source.script)
     let l:command = neural#job#PrepareCommand(l:buffer, l:command)
     let l:job_data = {
     \   'request_line': l:request_line,
@@ -203,7 +201,7 @@ function! neural#Prompt(prompt_text) abort
 
         call neural#job#SendRaw(l:job_id, l:stdin_data)
     else
-        call s:OutputErrorMessage('Failed to run ' . l:datasource.name)
+        call s:OutputErrorMessage('Failed to run ' . l:source.name)
     endif
 
     " TODO: Set a timer and check if the job is still running.

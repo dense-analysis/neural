@@ -106,14 +106,29 @@ silent! helptags ALL
 OpenAI is Neural's default data source.
 
 You will need to obtain an [OpenAI API key](https://beta.openai.com/signup/).
-Once you have your key, configure Neural to use that key.
+Once you have your key, configure Neural to use that key, whether in a Vim
+script or in a Lua config.
 
 ```vim
-let g:neural_datasource_config = {
-\   'openai': {
-\       'api_key': 'sk-...',
+" Configure Neural like so in Vimscript
+let g:neural = {
+\   'source': {
+\       'openai': {
+\           'api_key': $OPENAI_API_KEY,
+\       },
 \   },
 \}
+```
+
+```lua
+-- Configure Neural like so in Lua
+require('neural').setup({
+    source = {
+        openai = {
+            api_key = vim.env.OPENAI_API_KEY,
+        },
+    },
+})
 ```
 
 Try typing `:NeuralPrompt say hello`, and if all goes well the machine learning

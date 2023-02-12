@@ -18,6 +18,7 @@ let s:defaults = {
 \       'openai': {
 \           'api_key': '',
 \           'temperature': 0.2,
+\           'top_p': 1,
 \           'max_tokens': 1024,
 \           'presence_penalty': 0.1,
 \           'frequency_penalty': 0.1,

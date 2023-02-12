@@ -155,6 +155,31 @@ g:neural.source.openai.max_tokens           *g:neural.source.openai.max_tokens*
   This translates to roughly `¾` of a word (e.g. `100 tokens ~= 75 words`).
 
 
+g:neural.source.openai.presence_penalty
+                                      *g:neural.source.openai.presence_penalty*
+                                  *vim.g.neural.source.openai.presence_penalty*
+  Type: |Number| or |Float|
+  Default: `0.1`
+
+  Number between `-2.0` and `2.0`. Positive values penalize new tokens based on
+  whether they appear in the text so far, increasing the model's likelihood to
+  talk about new topics.
+
+  See: https://platform.openai.com/docs/api-reference/parameter-details
+
+
+g:neural.source.openai.frequency_penalty
+                                     *g:neural.source.openai.frequency_penalty*
+                                 *vim.g.neural.source.openai.frequency_penalty*
+  Type: |Number| or |Float|
+  Default: `0.1`
+
+  Number between `-2.0` and `2.0`. Positive values penalize new tokens based on
+  their existing frequency in the text so far, decreasing the model's
+  likelihood to repeat the same line verbatim.
+
+  See: https://platform.openai.com/docs/api-reference/parameter-details
+
 ===============================================================================
 4. Commands/Keybinds                                          *neural-commands*
 

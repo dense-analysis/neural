@@ -19,6 +19,8 @@ let s:defaults = {
 \           'api_key': '',
 \           'temperature': 0.2,
 \           'max_tokens': 1024,
+\           'presence_penalty': 0.1,
+\           'frequency_penalty': 0.1,
 \       },
 \   },
 \}

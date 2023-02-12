@@ -57,7 +57,7 @@ def get_openai_completion(
                 else:
                     openai_obj = json.loads(line_data)
 
-                    print(openai_obj["choices"][0]["text"], end="")
+                    print(openai_obj["choices"][0]["text"], end="", flush=True)
 
     print()
 

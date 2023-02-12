@@ -21,12 +21,14 @@ class Config:
         self,
         api_key: str,
         temperature: float,
+        top_p: float,
         max_tokens: int,
         presence_penalty: float,
         frequency_penalty: float,
     ):
         self.api_key = api_key
         self.temperature = temperature
+        self.top_p = top_p
         self.max_tokens = max_tokens
         self.presence_penalty = presence_penalty
         self.frequency_penalty = frequency_penalty
@@ -80,6 +82,7 @@ def get_openai_completion(config: Config, prompt: str) -> None:
 
 
 def load_config(raw_config: Dict[str, Any]) -> Config:
+    # TODO: Add range validation for request parameters.
     if not isinstance(raw_config, dict):  # type: ignore
         raise ValueError("openai config is not a dictionary")
 
@@ -92,6 +95,11 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
 
     if not isinstance(temperature, (int, float)):
         raise ValueError("openai.temperature is invalid")
+
+    top_p = raw_config.get('top_p', 1)
+
+    if not isinstance(top_p, (int, float)):
+        raise ValueError("openai.top_p is invalid")
 
     max_tokens = raw_config.get('max_tokens', 1024)
 
@@ -111,6 +119,7 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
     return Config(
         api_key=api_key,
         temperature=temperature,
+        top_p=top_p,
         max_tokens=max_tokens,
         presence_penalty=presence_penalty,
         frequency_penalty=presence_penalty,

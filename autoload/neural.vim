@@ -133,7 +133,7 @@ function! neural#OpenPrompt() abort
         " In Neovim, try to use the fancy prompt UI, if we can.
         lua require('neural').prompt()
     else
-        call feedkeys(':NeuralPrompt ')
+        call feedkeys(':Neural ')
     endif
 endfunction
 

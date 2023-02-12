@@ -36,7 +36,7 @@ function Neural.prompt()
             end
         )
     else
-        vim.fn.feedkeys(':NeuralPrompt ')
+        vim.fn.feedkeys(':Neural ')
     end
 end
 

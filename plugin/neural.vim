@@ -29,7 +29,7 @@ if !s:has_features
     finish
 endif
 
-command! -nargs=? NeuralPrompt :call neural#Prompt(<q-args>)
+command! -nargs=? Neural :call neural#Prompt(<q-args>)
 
 " <Plug> mappings for commands
 nnoremap <Plug>(neural_prompt) :call neural#OpenPrompt()<Return>

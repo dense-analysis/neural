@@ -203,9 +203,9 @@ g:neural.source.openai.top_p                     *g:neural.source.openai.top_p*
 4. Commands/Keybinds                                          *neural-commands*
 
 
-NeuralPrompt                                                     *NeuralPrompt*
+Neural                                                                 *Neural*
 
-  Prompt Neural for a response. e.g. `:NeuralPrompt say hello`
+  Prompt Neural for a response. e.g. `:Neural say hello`
 
   If the command is run with no text input and `nui.vim` is installed, a fancy
   UI for entering the prompt will be shown.

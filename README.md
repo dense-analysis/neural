@@ -1,6 +1,6 @@
 # ⚡ Neural
 
-![Neovim](https://img.shields.io/badge/NeoVim-%2357A143.svg?&style=for-the-badge&logo=neovim&logoColor=white) [![Join the Dense Analysis Discord server](https://img.shields.io/badge/chat-Discord-5865F2?style=for-the-badge&logo=appveyor)](https://discord.gg/5zFD6pQxDk)
+![Vim](https://img.shields.io/badge/VIM-%2311AB00.svg?style=for-the-badge&logo=vim&logoColor=white) ![Neovim](https://img.shields.io/badge/NeoVim-%2357A143.svg?&style=for-the-badge&logo=neovim&logoColor=white) [![Join the Dense Analysis Discord server](https://img.shields.io/badge/chat-Discord-5865F2?style=for-the-badge&logo=appveyor)](https://discord.gg/5zFD6pQxDk)
 
 Neural is a plugin for Vim and Neovim that provides blazingly fast AI code
 generation, editing, and completion.

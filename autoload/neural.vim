@@ -3,6 +3,10 @@
 
 " The location of Neural source scripts
 let s:neural_script_dir = expand('<sfile>:p:h:h') . '/neural_sources'
+" Keep track of the current job.
+let s:current_job = get(s:, 'current_job', 0)
+" Keep track of the line the last request happened on.
+let s:request_line = get(s:, 'request_line', 0)
 
 " Get the Neural scripts directory in a way that makes it hard to modify.
 function! neural#GetScriptDir() abort
@@ -74,10 +78,8 @@ function! s:AddErrorLine(buffer, job_data, line) abort
 endfunction
 
 function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
-    let l:request_line = a:job_data.request_line
-
     if has('nvim')
-        execute 'lua require(''neural'').stop_animated_sign(' . l:request_line . ')'
+        execute 'lua require(''neural'').stop_animated_sign(' . s:request_line . ')'
     endif
 
     " Output an error message from the program if something goes wrong.
@@ -86,9 +88,11 @@ function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
     else
         " Signal Neural is done for plugin integration.
         silent doautocmd <nomodeline> User NeuralWritePost
-        " FIXME: This can cause "Press Enter to continue..."
-        " no-custom-checks
-        echomsg 'Neural is done!'
+
+        if g:neural.ui.echo_enabled
+            " no-custom-checks
+            echomsg 'Neural is done!'
+        endif
     endif
 endfunction
 
@@ -137,7 +141,22 @@ function! neural#ComplainNoPromptText() abort
     call s:OutputErrorMessage('No prompt text!')
 endfunction
 
+function! s:InformUserIfStillBusy(job_id) abort
+    if neural#job#IsRunning(a:job_id)
+        " no-custom-checks
+        echomsg 'Neural is still working...'
+    endif
+endfunction
+
 function! neural#Prompt(prompt_text) abort
+    " Stop any currently running jobs.
+    call neural#job#Stop(s:current_job)
+
+    " Remove any current signs.
+    if has('nvim')
+        execute 'lua require(''neural'').stop_animated_sign(' . s:request_line . ')'
+    endif
+
     " Reload the Neural config on a prompt request if needed.
     call neural#config#Load()
 
@@ -171,8 +190,8 @@ function! neural#Prompt(prompt_text) abort
 
     let l:input = {'config': l:config, 'prompt': a:prompt_text}
     let l:buffer = bufnr('')
-    let l:request_line = getpos('.')[1]
     let l:moving_line = getpos('.')[1]
+    let s:request_line = l:moving_line
 
     if len(getline(l:moving_line)) == 0
         let l:moving_line -= 1
@@ -183,7 +202,6 @@ function! neural#Prompt(prompt_text) abort
     \   . ' ' . neural#Escape(l:source.script)
     let l:command = neural#job#PrepareCommand(l:buffer, l:command)
     let l:job_data = {
-    \   'request_line': l:request_line,
     \   'moving_line': l:moving_line,
     \   'error_lines': [],
     \   'content_started': 0,
@@ -202,24 +220,22 @@ function! neural#Prompt(prompt_text) abort
         call neural#job#SendRaw(l:job_id, l:stdin_data)
     else
         call s:OutputErrorMessage('Failed to run ' . l:source.name)
+
+        return
     endif
 
-    " TODO: Set a timer and check if the job is still running.
-    "       if the job is still running after some time, print another
-    "       friendly message explaining that we're still waiting for
-    "       the first message to come through.
-    "
-    "       Maybe print a different message if we're buffering a response
-    "       the user can't see yet, which still makes sense when we make
-    "       it print the results live. Maybe users will want to disable
-    "       the 'cool' printing of messages in any case.
-    "
-    " FIXME: This can cause "Press Enter to continue..."
-    "
-    " no-custom-checks
-    echomsg 'Neural is working, please wait...'
+    let s:current_job = l:job_id
+
+    " Tell the user something is happening, if enabled.
+    if g:neural.ui.echo_enabled
+        " no-custom-checks
+        echomsg 'Neural is working, please wait...'
+
+        " If returning an answer takes a while, tell them again.
+        call timer_start(5000, {-> s:InformUserIfStillBusy(l:job_id)})
+    endif
 
     if has('nvim')
-        execute 'lua require(''neural'').start_animated_sign(' . l:request_line . ')'
+        execute 'lua require(''neural'').start_animated_sign(' . s:request_line . ')'
     endif
 endfunction

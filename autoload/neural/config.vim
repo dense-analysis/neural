@@ -10,9 +10,10 @@ endif
 let s:defaults = {
 \   'selected': 'openai',
 \   'ui': {
-\        'prompt_enabled': v:true,
-\        'prompt_icon': '🗲',
-\        'animated_sign_enabled': v:true,
+\       'prompt_enabled': v:true,
+\       'prompt_icon': '🗲',
+\       'animated_sign_enabled': v:true,
+\       'echo_enabled': v:true,
 \   },
 \   'source': {
 \       'openai': {

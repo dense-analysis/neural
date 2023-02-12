@@ -78,6 +78,16 @@ g:neural.selected                                           *g:neural.selected*
   1. `'openai'` - OpenAI
 
 
+g:neural.ui.echo_enabled                             *g:neural.ui.echo_enabled*
+                                                 *vim.g.neural.ui.echo_enabled*
+  Type: |Boolean|
+  Default: `v:true`
+
+  If `v:true`, echo messages about things that are happening.
+
+  You might want to disable this option if you are asked to press Enter a lot.
+
+
 g:neural.ui.prompt_enabled                         *g:neural.ui.prompt_enabled*
                                                *vim.g.neural.ui.prompt_enabled*
   Type: |Boolean|

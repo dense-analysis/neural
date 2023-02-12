@@ -21,9 +21,15 @@ class Config:
         self,
         api_key: str,
         temperature: float,
+        max_tokens: int,
+        presence_penalty: float,
+        frequency_penalty: float,
     ):
         self.api_key = api_key
         self.temperature = temperature
+        self.max_tokens = max_tokens
+        self.presence_penalty = presence_penalty
+        self.frequency_penalty = frequency_penalty
 
 
 
@@ -36,10 +42,10 @@ def get_openai_completion(config: Config, prompt: str) -> None:
         "model": "text-davinci-003",
         "prompt": prompt,
         "temperature": config.temperature,
-        "max_tokens": 1024,
+        "max_tokens": config.max_tokens,
         "top_p": 1,
-        "frequency_penalty": 0.3,
-        "presence_penalty": 0.3,
+        "presence_penalty": config.presence_penalty,
+        "frequency_penalty": config.frequency_penalty,
         "stream": True,
     }
     req = urllib.request.Request(
@@ -82,14 +88,32 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
     if not isinstance(api_key, str) or not api_key:  # type: ignore
         raise ValueError("openai.api_key is not defined")
 
-    temperature = raw_config.get('temperature', 0)
+    temperature = raw_config.get('temperature', 0.2)
 
     if not isinstance(temperature, (int, float)):
         raise ValueError("openai.temperature is invalid")
 
+    max_tokens = raw_config.get('max_tokens', 1024)
+
+    if not isinstance(max_tokens, (int)):
+        raise ValueError("openai.max_tokens is invalid")
+
+    presence_penalty = raw_config.get('presence_penalty', 0)
+
+    if not isinstance(presence_penalty, (int, float)):
+        raise ValueError("openai.presence_penalty is invalid")
+
+    frequency_penalty = raw_config.get('frequency_penalty', 0)
+
+    if not isinstance(frequency_penalty, (int, float)):
+        raise ValueError("openai.frequency_penalty is invalid")
+
     return Config(
         api_key=api_key,
         temperature=temperature,
+        max_tokens=max_tokens,
+        presence_penalty=presence_penalty,
+        frequency_penalty=presence_penalty,
     )
 
 

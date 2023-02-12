@@ -99,7 +99,18 @@ endfunction
 " Get the path to the executable for a script language.
 function! s:GetScriptExecutable(source) abort
     if a:source.script_language is# 'python'
-        return 'python3'
+        let l:executable = ''
+
+        if has('win32')
+            " Try to automatically find Python on Windows, even if not in PATH.
+            let l:executable = expand('~/AppData/Local/Programs/Python/Python3*/python.exe')
+        endif
+
+        if empty(l:executable)
+            let l:executable = 'python3'
+        endif
+
+        return l:executable
     endif
 
     throw 'Unknown script language: ' . a:source.script_language

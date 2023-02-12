@@ -148,7 +148,7 @@ function! s:InformUserIfStillBusy(job_id) abort
     endif
 endfunction
 
-function! neural#Prompt(prompt_text) abort
+function! neural#Cleanup() abort
     " Stop any currently running jobs.
     call neural#job#Stop(s:current_job)
 
@@ -156,9 +156,12 @@ function! neural#Prompt(prompt_text) abort
     if has('nvim')
         execute 'lua require(''neural'').stop_animated_sign(' . s:request_line . ')'
     endif
+endfunction
 
+function! neural#Prompt(prompt_text) abort
     " Reload the Neural config on a prompt request if needed.
     call neural#config#Load()
+    call neural#Cleanup()
 
     if empty(a:prompt_text)
         if has('nvim') && g:neural.ui.prompt_enabled
@@ -239,3 +242,14 @@ function! neural#Prompt(prompt_text) abort
         execute 'lua require(''neural'').start_animated_sign(' . s:request_line . ')'
     endif
 endfunction
+
+" Stop Neural doing things when you kill buffers, quit, or suspend.
+augroup NeuralCleanupGroup
+    autocmd!
+    autocmd BufDelete * call neural#Cleanup()
+    autocmd QuitPre * call neural#Cleanup()
+
+    if exists('##VimSuspend')
+        autocmd VimSuspend call neural#Cleanup()
+    endif
+augroup END

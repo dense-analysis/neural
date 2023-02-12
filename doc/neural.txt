@@ -1,0 +1,246 @@
+*neural.txt* Plugin to generate text and code with machine learning.
+*neural*
+
+===============================================================================
+CONTENTS                                                      *neural-contents*
+
+  1. Introduction.........................|neural-introduction|
+  2. Supported Tools......................|neural-support|
+  3. Options..............................|neural-options|
+    3.1 OpenAI............................|neural-openai|
+  4. Commands/Keybinds....................|neural-commands|
+  5. API..................................|neural-api|
+  6. Contact..............................|neural-contact|
+
+===============================================================================
+1. Introduction                                           *neural-introduction*
+
+Neural is a plugin for Vim and Neovim that provides blazingly fast AI code
+generation, editing, and completion.
+
+It uses machine learning tools under the hood, such as OpenAI's GPT-3 API, to
+generate text, code, and much more.
+
+===============================================================================
+2. Supported Languages & Tools                                 *neural-support*
+
+Neural supports the following tools.
+
+1. OpenAI - https://beta.openai.com/signup/
+
+To select the tool that Neural will use, set |g:neural.selected| to the
+appropriate value. OpenAI is the default data source.
+
+===============================================================================
+3. Options                                                     *neural-options*
+                                                                     *g:neural*
+
+All of Neural's options are controlled with a single dictionary that can be
+configured either in Vim or in Lua.
+
+In Vim just set `g:neural`: >
+
+  let g:neural = {
+  \   'source': {
+  \       'openai': {
+  \           'api_key': $OPENAI_API_KEY,
+  \       },
+  \   },
+  \}
+<
+In a Neovim `init.lua` call `require('neural').setup`: >
+
+  require('neural').setup({
+      ui = {
+          animated_sign_enabled = false,
+      },
+      source = {
+          openai = {
+              api_key = vim.env.OPENAI_API_KEY,
+          },
+      },
+  })
+<
+
+You can modify settings at any time, before or after Neural is loaded, and
+Neural will react to the change in settings. A complete list of supported
+options listed below.
+
+-------------------------------------------------------------------------------
+
+g:neural.selected                                           *g:neural.selected*
+                                                        *vim.g.neural.selected*
+  Type: |String|
+  Default: `'openai'`
+
+  Selects a source for Neural to use. Possible values are:
+
+  1. `'openai'` - OpenAI
+
+
+g:neural.ui.echo_enabled                             *g:neural.ui.echo_enabled*
+                                                 *vim.g.neural.ui.echo_enabled*
+  Type: |Boolean|
+  Default: `v:true`
+
+  If `v:true`, echo messages about things that are happening.
+
+  You might want to disable this option if you are asked to press Enter a lot.
+
+
+g:neural.ui.prompt_enabled                         *g:neural.ui.prompt_enabled*
+                                               *vim.g.neural.ui.prompt_enabled*
+  Type: |Boolean|
+  Default: `v:true`
+
+  If `v:true`, show a fancy prompt.
+
+  Available in Neovim only with `nui.nvim` installed.
+
+  The icon can be changed with |g:neural.ui.prompt_icon|.
+
+
+g:neural.ui.prompt_icon                               *g:neural.ui.prompt_icon*
+                                                  *vim.g.neural.ui.prompt_icon*
+  Type: |String|
+  Default: `'🗲'`
+
+  Set the icon Neural uses in the Neovim animated prompt.
+
+  See also: |g:neural.ui.prompt_enabled|.
+
+
+g:neural.ui.animated_sign_enabled           *g:neural.ui.animated_sign_enabled*
+                                        *vim.g.neural.ui.animated_sign_enabled*
+  Type: |Boolean|
+  Default: `v:true`
+
+  If `v:true`, show animated signs when Neural is working.
+
+  Available in Neovim only with `significant.nvim` installed.
+
+
+-------------------------------------------------------------------------------
+3.1 OpenAI                                                      *neural-openai*
+
+Options for configuring OpenAI are listed below.
+
+
+g:neural.source.openai.api_key                 *g:neural.source.openai.api_key*
+                                           *vim.g.neural.source.openai.api_key*
+  Type: |String|
+  Default: `''`
+
+  The OpenAI API key. See: https://beta.openai.com/signup/
+
+
+g:neural.source.openai.frequency_penalty
+                                     *g:neural.source.openai.frequency_penalty*
+                                 *vim.g.neural.source.openai.frequency_penalty*
+  Type: |Number| or |Float|
+  Default: `0.1`
+
+  Number between `-2.0` and `2.0`.
+  Positive values penalize new tokens based on their existing frequency in the
+  output so far, decreasing the likelihood to repeat the same line verbatim.
+
+  See: https://platform.openai.com/docs/api-reference/parameter-details
+
+
+g:neural.source.openai.max_tokens           *g:neural.source.openai.max_tokens*
+                                        *vim.g.neural.source.openai.max_tokens*
+  Type: |Number|
+  Default: `1024`
+
+  The maximum number of tokens to generate in the output.
+  One token generally corresponds to `~4` characters for common English text.
+
+  This translates to roughly `¾` of a word (e.g. `100 tokens ~= 75 words`).
+
+
+g:neural.source.openai.presence_penalty
+                                      *g:neural.source.openai.presence_penalty*
+                                  *vim.g.neural.source.openai.presence_penalty*
+  Type: |Number| or |Float|
+  Default: `0.1`
+
+  Number between `-2.0` and `2.0`.
+
+  Positive values penalize new tokens based on whether they appear in the text
+  so far, increasing the model's likelihood to talk about new topics.
+
+  See: https://platform.openai.com/docs/api-reference/parameter-details
+
+
+g:neural.source.openai.temperature         *g:neural.source.openai.temperature*
+                                       *vim.g.neural.source.openai.temperature*
+  Type: |Number| or |Float|
+  Default: `0.2`
+
+  The OpenAI sampling temperature between `0` and `2`.
+
+  Higher values like `0.8` will make the output more random, while lower values
+  like `0.2` will make it more focused and deterministic.
+
+
+g:neural.source.openai.top_p                     *g:neural.source.openai.top_p*
+                                             *vim.g.neural.source.openai.top_p*
+  Type: |Number| or |Float|
+  Default: `1`
+
+  The OpenAI nucleus sampling between `0` and `1`.
+
+  An alternative to sampling with temperature, called nucleus sampling, where
+  the model considers the results of the tokens with top_p probability mass.
+
+  For example `0.1` means only tokens comprising the top `10%` probability mass
+  are considered.
+
+  OpenAI recommends altering this or temperature but not both.
+
+
+===============================================================================
+4. Commands/Keybinds                                          *neural-commands*
+
+
+Neural                                                                 *Neural*
+
+  Prompt Neural for a response. e.g. `:Neural say hello`
+
+  If the command is run with no text input and `nui.vim` is installed, a fancy
+  UI for entering the prompt will be shown.
+
+  See https://github.com/MunifTanjim/nui.nvim for installation instructions.
+
+  A plug mapping `<Plug>(neural_prompt)` is defined for this command.
+
+  A |NeuralWritePost| event will be fired whenever Neural successfully
+  completes writing text to a buffer.
+
+
+===============================================================================
+5. API                                                             *neural-api*
+
+NeuralWritePost                                       *NeuralWritePost-autocmd*
+                                                              *NeuralWritePost*
+
+  An event that fires whenever Neural successfully completes writing text to a
+  buffer. This event can be used to trigger other commands on files, such as
+  automatically fixing generated code with ALE. >
+
+  augroup NeuralEvents
+      autocmd!
+      autocmd User NeuralWritePost ALEFix!
+  augroup END
+<
+
+===============================================================================
+5. Contact                                                     *neural-contact*
+
+If you like this plugin, and wish to get in touch, check out the GitHub
+page for issues and more at https://github.com/dense-analysis/neural
+
+Machines should work; people should think.
+
+===============================================================================
+  vim:tw=78:ts=2:sts=2:sw=2:ft=help:norl:

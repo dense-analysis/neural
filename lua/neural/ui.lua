@@ -2,7 +2,6 @@
 
 local Input = require('nui.input')
 local Event = require('nui.utils.autocmd').event
-local Config = require('neural.config')
 
 local UI = {}
 
@@ -10,7 +9,6 @@ local UI = {}
 --- @param title string The title of the prompt.
 --- @param on_submit function The function to call when the user submits the prompt.
 function UI.prompt(title, on_submit)
-
     -- TODO: Make escape keys configurable.
     local exit_keys = {
         {'n', 'q',
@@ -56,7 +54,7 @@ function UI.prompt(title, on_submit)
             winhighlight = 'Normal:Normal',
         },
     }, {
-        prompt = Config.options.ui.icon .. ' ',
+        prompt = vim.g.neural.ui.prompt_icon .. ' ',
         default_value = '',
         on_close = function() end,
         on_submit = function(value)

@@ -136,7 +136,7 @@ g:neural.source.openai.api_key                 *g:neural.source.openai.api_key*
 g:neural.source.openai.temperature         *g:neural.source.openai.temperature*
                                        *vim.g.neural.source.openai.temperature*
   Type: |Number| or |Float|
-  Default: `''`
+  Default: `0`
 
   The OpenAI temperature.
 

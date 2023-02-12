@@ -177,9 +177,10 @@ g:neural.source.openai.presence_penalty
   Type: |Number| or |Float|
   Default: `0.1`
 
-  Number between `-2.0` and `2.0`. Positive values penalize new tokens based on
-  whether they appear in the text so far, increasing the model's likelihood to
-  talk about new topics.
+  Number between `-2.0` and `2.0`.
+
+  Positive values penalize new tokens based on whether they appear in the text
+  so far, increasing the model's likelihood to talk about new topics.
 
   See: https://platform.openai.com/docs/api-reference/parameter-details
 
@@ -190,9 +191,9 @@ g:neural.source.openai.frequency_penalty
   Type: |Number| or |Float|
   Default: `0.1`
 
-  Number between `-2.0` and `2.0`. Positive values penalize new tokens based on
-  their existing frequency in the text so far, decreasing the model's
-  likelihood to repeat the same line verbatim.
+  Number between `-2.0` and `2.0`.
+  Positive values penalize new tokens based on their existing frequency in the
+  output so far, decreasing the likelihood to repeat the same line verbatim.
 
   See: https://platform.openai.com/docs/api-reference/parameter-details
 

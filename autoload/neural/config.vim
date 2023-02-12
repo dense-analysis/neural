@@ -17,7 +17,8 @@ let s:defaults = {
 \   'source': {
 \       'openai': {
 \           'api_key': '',
-\           'temperature': 0,
+\           'temperature': 0.2,
+\           'max_tokens': 1024,
 \       },
 \   },
 \}

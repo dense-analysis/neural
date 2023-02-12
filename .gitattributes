@@ -1,0 +1,8 @@
+.* export-ignore
+/env export-ignore
+/Dockerfile export-ignore
+/README.md export-ignore
+/install-python-env.sh export-ignore
+/run-tests export-ignore
+/run-tests.bat export-ignore
+/test export-ignore

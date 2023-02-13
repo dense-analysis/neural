@@ -40,9 +40,6 @@ tests="$2"
 echo "$vim"
 
 case $vim in
-    neovim-v0.2*)
-        headless=''
-    ;;
     # Neovim 0.6+ requires headless argument to load Vader tests.
     neovim*)
         headless='--headless'
@@ -149,7 +146,7 @@ while [ "$tries" -lt 5 ]; do
     set -o pipefail
     # shellcheck disable=SC2086
     docker run -a stderr -e VADER_OUTPUT_FILE=/dev/stderr "${docker_flags[@]}" \
-        "/vim-build/bin/$vim" -u test/vimrc ${headless} \
+        "/vim-build/bin/$vim" -u test/vim/vimrc ${headless} \
         "+Vader! $tests" 2>&1 | filter-vader-output | color-vader-output || exit_code=$?
     set +o pipefail
 

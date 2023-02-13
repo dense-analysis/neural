@@ -25,13 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vim-version:
+        job-type:
           - '--vim-80-only'
           - '--vim-90-only'
-          - '--neovim-06-only'
           - '--neovim-08-only'
+          - '--python-only'
           - '--linters-only'
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: ./run-tests -v ${{ matrix.vim-version }}
+        run: ./run-tests -v ${{ matrix.job-type }}

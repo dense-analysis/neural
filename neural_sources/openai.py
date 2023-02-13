@@ -34,7 +34,6 @@ class Config:
         self.frequency_penalty = frequency_penalty
 
 
-
 def get_openai_completion(config: Config, prompt: str) -> None:
     headers = {
         "Content-Type": "application/json",
@@ -139,6 +138,7 @@ def main() -> None:
             sys.exit("Neural error: OpenAI request limit reached!")
         else:
             raise
+
 
 if __name__ == "__main__":  # pragma: no cover
     main()  # pragma: no cover

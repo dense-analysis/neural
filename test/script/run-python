@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -eu
+
+exit_code=0
+
+docker_flags=(--rm -v "$PWD:/testplugin" -w /testplugin "$DOCKER_RUN_IMAGE")
+
+echo '========================================'
+echo 'Running Python checks'
+echo '========================================'
+echo 'tox warnings/errors follow:'
+echo
+
+set -o pipefail
+docker run -a stdout "${docker_flags[@]}" tox --workdir .tox-docker --skip-missing-interpreters=false || exit_code=$?
+set +o pipefail
+
+exit $exit_code

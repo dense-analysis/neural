@@ -7,10 +7,10 @@ OpenAI for blazingly fast text and code generation.
 
 ## 🌟 Features
 
-* Compatible with Vim 8.0+
+* Compatible with Vim 8.0+ and Neovim 0.8+
 * Support for multiple machine learning models
 * Generates text easily (`:Neural write a story`)
-* The only dependency is Python
+* The only dependency is Python 3.7+
 * Supported on Linux, Mac OSX, and Windows
 
 https://user-images.githubusercontent.com/38880939/209406364-d1ae162a-9fb3-4e15-8dbb-4890a4db1f5d.mov

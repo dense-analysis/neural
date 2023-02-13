@@ -12,9 +12,11 @@ echo '========================================'
 echo 'Vint warnings/errors follow:'
 echo
 
+vint='/root/.pyenv/versions/3.10.10/bin/vint'
+
 set -o pipefail
-docker run -a stdout "${docker_flags[@]}" vint -s . || exit_code=$?
+docker run -a stdout "${docker_flags[@]}" "$vint" -s autoload plugin || exit_code=$?
 set +o pipefail
 echo
 
-exit $exit_code
+exit "$exit_code"

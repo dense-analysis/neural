@@ -82,6 +82,7 @@ def test_main_function_rate_other_error():
         with pytest.raises(urllib.error.HTTPError):
             openai.main()
 
+
 def test_print_openai_results():
     result_data = (
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "\\n", "index": 0, "logprobs": null, "finish_reason": null}], "model": "text-davinci-003"}\n'  # noqa
@@ -90,7 +91,7 @@ def test_print_openai_results():
         b'\n'
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "Hello", "index": 0, "logprobs": null, "finish_reason": null}], "model": "text-davinci-003"}\n'  # noqa
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "!", "index": 0, "logprobs": null, "finish_reason": null}], "model": "text-davinci-003"}\n'  # noqa
-         b'\n'
+        b'\n'
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "", "index": 0, "logprobs": null, "finish_reason": "stop"}], "model": "text-davinci-003"}\n'  # noqa
         b'\n'
         b'data: [DONE]\n'
@@ -118,6 +119,7 @@ def test_print_openai_results():
         mock.call('', end='', flush=True),
         mock.call(),
     ]
+
 
 def test_main_function_bad_config():
     with mock.patch.object(sys.stdin, 'readline') as readline_mock, \

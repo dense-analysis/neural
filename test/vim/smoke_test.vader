@@ -1,3 +1,3 @@
 Execute(Check that Neural scripts load at all):
   AssertEqual v:t_string, type(neural#Escape(''))
-  AssertEqual v:t_dict, type(neural#datasource#openai#Get())
+  AssertEqual v:t_dict, type(neural#source#openai#Get())

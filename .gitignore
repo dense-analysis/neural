@@ -1,3 +1,6 @@
-tags
+.coverage
 .directory
+.tox
 /env
+__pycache__
+tags

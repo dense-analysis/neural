@@ -4,8 +4,8 @@ A Neural datasource for loading generated text via OpenAI.
 import json
 import sys
 import urllib.error
-from typing import Any, Dict
 import urllib.request
+from typing import Any, Dict
 
 API_ENDPOINT = 'https://api.openai.com/v1/completions'
 
@@ -56,8 +56,6 @@ def get_openai_completion(config: Config, prompt: str) -> None:
         headers=headers,
         method="POST",
     )
-
-    buffer = b''
 
     with urllib.request.urlopen(req) as response:
         while True:

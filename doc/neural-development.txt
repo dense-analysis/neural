@@ -1,0 +1,17 @@
+WIP
+
+Make sure all required Python versions for testing are installed.
+
+Neural tests against Python 3.7 and Python 3.10.
+
+Run the following: >
+  python -m pip install --user tox
+  python -m tox
+<
+
+To get the same configuration in your editor, run `./install-python-env.sh`.
+ALE should pick up on how to run `ruff` and `pyright` automatically.
+
+
+===============================================================================
+  vim:tw=78:ts=2:sts=2:sw=2:ft=help:norl:

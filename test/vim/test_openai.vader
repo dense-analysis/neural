@@ -1,0 +1,8 @@
+Execute(The OpenAI source Dictionary should be correct):
+  AssertEqual
+  \ {
+  \   'name': 'openai',
+  \   'script_language': 'python',
+  \   'script': neural#GetScriptDir() . '/openai.py'
+  \ },
+  \ neural#source#openai#Get()

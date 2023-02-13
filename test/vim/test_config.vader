@@ -1,0 +1,95 @@
+Before:
+  Save g:neural
+  Save g:time
+  unlet! g:neural
+
+After:
+  unlet! g:time
+
+  Restore
+
+Execute(The default selection should be correct):
+  call neural#config#Load()
+
+  AssertEqual 'openai', get(g:neural, 'selected')
+
+Execute(The default prompt settings should be correct):
+  call neural#config#Load()
+  call filter(g:neural.ui, {key -> key =~ 'prompt'})
+
+  AssertEqual {'prompt_enabled': v:true, 'prompt_icon': '🗲'}, g:neural.ui
+
+Execute(The default animated sign settings should be correct):
+  call neural#config#Load()
+  call filter(g:neural.ui, {key -> key =~ 'animated'})
+
+  AssertEqual {'animated_sign_enabled': v:true}, g:neural.ui
+
+Execute(The default echo settings should be correct):
+  call neural#config#Load()
+  call filter(g:neural.ui, {key -> key =~ 'echo'})
+
+  AssertEqual {'echo_enabled': v:true}, g:neural.ui
+
+Execute(The default openai settings should be correct):
+  call neural#config#Load()
+
+  AssertEqual
+  \ {
+  \   'api_key': '',
+  \   'temperature': 0.2,
+  \   'top_p': 1,
+  \   'max_tokens': 1024,
+  \   'presence_penalty': 0.1,
+  \   'frequency_penalty': 0.1,
+  \ },
+  \ get(g:neural.source, 'openai')
+
+Execute(Settings should be merged correctly):
+  for s:i in range(2)
+    if s:i == 0
+      " Try the method of setting g:neural the first time.
+      let g:neural = {
+      \ 'ui': {'echo_enabled': v:true},
+      \ 'source': {
+      \   'openai': {'api_key': 'mykey'},
+      \ },
+      \}
+    else
+      " Try calling Set with no global like Lua will the second time.
+      call neural#config#Set(remove(g:, 'neural'))
+    endif
+
+    " The results should be the same in each case.
+    call neural#config#Load()
+    call filter(g:neural, {key -> key =~ '\v^ui$|^source$'})
+    call filter(g:neural.ui, {key -> key is# 'echo_enabled'})
+    call filter(g:neural.source, {key -> key is# 'openai'})
+    call filter(g:neural.source.openai, {key -> key is# 'api_key'})
+
+    AssertEqual
+    \ {
+    \   'ui': {'echo_enabled': v:true},
+    \   'source': {
+    \     'openai': {'api_key': 'mykey'},
+    \   },
+    \ },
+    \ g:neural
+  endfor
+
+Execute(Settings should load quickly after the first merge):
+  let g:time = localtime()
+
+  for s:i in range(1000)
+    call neural#config#Load()
+  endfor
+
+  Assert localtime() - g:time <= 2
+
+Execute(Settings should update when g:neural is changed):
+  call neural#config#Load()
+  let g:neural = {'source': {'openai': {'api_key': 'mykey'}}}
+  call neural#config#Load()
+
+  AssertEqual 'mykey', g:neural.source.openai.api_key
+  AssertEqual 0.2, g:neural.source.openai.temperature

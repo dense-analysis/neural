@@ -2,12 +2,12 @@
 name: CI
 on:  # yamllint disable-line rule:truthy
   push:
-    branches: [ master ]  # yamllint disable-line rule:brackets
+    branches: [ main ]  # yamllint disable-line rule:brackets
     tags:
       - v[0-9]+.[0-9]+.x
       - v[0-9]+.[0-9]+.[0-9]+
   pull_request:
-    branches: [ master ]  # yamllint disable-line rule:brackets
+    branches: [ main ]  # yamllint disable-line rule:brackets
 
 jobs:
   build_image:

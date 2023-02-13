@@ -7,11 +7,11 @@ OpenAI for blazingly fast text and code generation.
 
 ## 🌟 Features
 
-* Compatible with Vim 8.0+ and Neovim 0.8+
+* Generate text easy `:Neural write a story`
 * Support for multiple machine learning models
-* Generates text easily (`:Neural write a story`)
-* The only dependency is Python 3.7+
+* Compatible with Vim 8.0+ & Neovim 0.8+
 * Supported on Linux, Mac OSX, and Windows
+* Only dependency is Python 3.7+
 
 https://user-images.githubusercontent.com/38880939/209406364-d1ae162a-9fb3-4e15-8dbb-4890a4db1f5d.mov
 
@@ -36,14 +36,28 @@ them for a better experience.
 
 Add Neural to your runtime path in the usual ways.
 
-* Vim `packload`:
-  * `git clone --depth 1 https://github.com/dense-analysis/neural.git ~/.vim/pack/git-plugins/start/neural`
-* Neovim `packload`:
-  * `git clone --depth 1 https://github.com/dense-analysis/neural.git ~/.local/share/nvim/site/pack/git-plugins/start/neural`
-* Windows `packload`:
-  * `git clone --depth 1 https://github.com/dense-analysis/neural.git ~/vimfiles/pack/git-plugins/start/neural`
-* [vim-plug](https://github.com/junegunn/vim-plug): `Plug 'dense-analysis/neural'`
-* [Vundle](https://github.com/VundleVim/Vundle.vim): `Plugin 'dense-analysis/neural'`
+#### Vim `packload`:
+```bash
+git clone --depth 1 https://github.com/dense-analysis/neural.git ~/.vim/pack/git-plugins/start/neural
+```
+#### Neovim `packload`:
+```bash
+git clone --depth 1 https://github.com/dense-analysis/neural.git ~/.local/share/nvim/site/pack/git-plugins/start/neural
+```
+#### Windows `packload`:
+```bash
+git clone --depth 1 https://github.com/dense-analysis/neural.git ~/vimfiles/pack/git-plugins/start/neural
+```
+#### [vim-plug](https://github.com/junegunn/vim-plug)
+```vim
+Plug 'dense-analysis/neural'
+    Plug 'muniftanjim/nui.nvim'
+    Plug 'elpiloto/significant.nvim'
+```
+#### [Vundle](https://github.com/VundleVim/Vundle.vim) 
+```vim
+Plugin 'dense-analysis/neural'
+```
 
 If you have trouble reading `:help neural`, try the following.
 
@@ -105,8 +119,7 @@ Special thanks are due for the following individuals:
 
 ## ℹ️ Disclaimer
 
-All input data (including visually highlighted code and configurable context
-lines of code) will be sent to third party servers in order to query the machine
+All input data will be sent to third party servers in order to query the machine
 learning models.
 
 Language generation models based on the transformer architecture have shown

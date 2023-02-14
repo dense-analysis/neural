@@ -10,7 +10,9 @@ CONTENTS                                                      *neural-contents*
     3.1 OpenAI............................|neural-openai|
   4. Commands/Keybinds....................|neural-commands|
   5. API..................................|neural-api|
-  6. Contact..............................|neural-contact|
+  6. Environment Variables................|neural-env|
+    6.1 Linux + KDE.......................|neural-env-kde|
+  7. Contact..............................|neural-contact|
 
 ===============================================================================
 1. Introduction                                           *neural-introduction*
@@ -235,7 +237,55 @@ NeuralWritePost                                       *NeuralWritePost-autocmd*
 <
 
 ===============================================================================
-5. Contact                                                     *neural-contact*
+6. Environment Variables                                           *neural-env*
+
+Configuring environment variables across different operating systems is almost
+a research topic of its own. This section of documentation provides some
+helpful pointers for where you might like to stuff environment variables on
+different systems. Pick the strategy you like most, based on a balance of your
+own level of security concerns and need for convenience.
+
+
+-------------------------------------------------------------------------------
+6.1 Linux + KDE                                                *neural-env-kde*
+
+KDE makes it easy to set environment variables such that they can be read by
+all GUI applications. One strategy you can try is to make environment
+variables available to GUI apps, and then also expose them in your shell.  KDE
+will read any script stored in `~/.config/plasma-workspace/env`. Create a file
+named `~/.config/plasma-workspace/env/keys.sh` with the following contents,
+and make sure to set `chmod ug+x` on the file. >
+
+  #!/bin/bash
+
+  # Put whatever variables you want here.
+  export OPENAI_API_KEY='sh...'
+<
+Once in place, `source` the same script in your shell startup script, such as
+`~/.bashrc`, like so: >
+
+  # shellcheck source=.config/plasma-workspace/env/keys.sh
+  source ~/.config/plasma-workspace/env/keys.sh
+<
+The `shellcheck` comment will tell `shellcheck` where to read the script from,
+which will help it to understand which variables are valid, etc. After a
+reboot, you will be able to access your environment variables in any Vim or
+GUI Vim startup script you like uniformly, like so: >
+
+  let g:neural = {
+  \   'source': {
+  \       'openai': {
+  \           'api_key': $OPENAI_API_KEY,
+  \       },
+  \   },
+  \}
+<
+All applications on your system will also be able to read the same environment
+variable, so consider that in terms of security.
+
+
+===============================================================================
+7. Contact                                                     *neural-contact*
 
 If you like this plugin, and wish to get in touch, check out the GitHub
 page for issues and more at https://github.com/dense-analysis/neural

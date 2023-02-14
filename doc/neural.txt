@@ -268,9 +268,9 @@ Once in place, `source` the same script in your shell startup script, such as
   source ~/.config/plasma-workspace/env/keys.sh
 <
 The `shellcheck` comment will tell `shellcheck` where to read the script from,
-which will help it to understand which variables are valid, etc. After a
-reboot, you will be able to access your environment variables in any Vim or
-GUI Vim startup script you like uniformly, like so: >
+which will help it to understand which variables are valid, etc. After logging
+out and in again, you will be able to access your environment variables in any
+Vim or GUI Vim startup script you like uniformly, like so: >
 
   let g:neural = {
   \   'source': {

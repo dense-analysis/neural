@@ -40,7 +40,9 @@ function! s:OutputErrorMessage(message) abort
 endfunction
 
 function! s:AddLineToBuffer(buffer, job_data, line) abort
-    if bufnr('') isnot a:buffer
+    " Add lines either if we can add them to the buffer which is no longer the
+    " current one, or otherwise only if we're still in the same buffer.
+    if bufnr('') isnot a:buffer && !exists('*appendbufline')
         return
     endif
 
@@ -62,7 +64,12 @@ function! s:AddLineToBuffer(buffer, job_data, line) abort
         let l:move_up = 1
     endif
 
-    call append(l:moving_line, a:line)
+    " appendbufline isn't available in old Vim versions.
+    if bufnr('') is a:buffer
+        call append(l:moving_line, a:line)
+    else
+        call appendbufline(a:buffer, l:moving_line, a:line)
+    endif
 
     " Move the cursor back up again to make content appear below.
     if l:move_up

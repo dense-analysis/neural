@@ -159,6 +159,13 @@ function! neural#ComplainNoPromptText() abort
     call s:OutputErrorMessage('No prompt text!')
 endfunction
 
+function! s:InitiallyInformUser(job_id) abort
+    if neural#job#IsRunning(a:job_id)
+        " no-custom-checks
+        echomsg 'Neural is working...'
+    endif
+endfunction
+
 function! s:InformUserIfStillBusy(job_id) abort
     if neural#job#IsRunning(a:job_id)
         " no-custom-checks
@@ -249,8 +256,8 @@ function! neural#Prompt(prompt_text) abort
 
     " Tell the user something is happening, if enabled.
     if g:neural.ui.echo_enabled
-        " no-custom-checks
-        echomsg 'Neural is working, please wait...'
+        " Echo with a 0 millisecond timer to avoid 'Press Enter to Continue'
+        call timer_start(0, {-> s:InitiallyInformUser(l:job_id)})
 
         " If returning an answer takes a while, tell them again.
         call timer_start(5000, {-> s:InformUserIfStillBusy(l:job_id)})

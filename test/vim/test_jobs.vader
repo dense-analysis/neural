@@ -1,0 +1,51 @@
+Before:
+  let g:data = ''
+  let g:code = -1
+  let g:iterations = 0
+
+  function! CollectLine(job_id, line) abort
+    let g:data .= substitute(a:line, '\v^\s+|\s+$', '', 'g')
+  endfunction
+
+  function ExitCallback(job_id, exit_code) abort
+    let g:code = a:exit_code
+  endfunction
+
+After:
+  unlet! g:data
+  unlet! g:code
+  unlet! g:iterations
+  unlet! g:job_id
+
+  delfunction CollectLine
+  delfunction ExitCallback
+
+Execute(Check that jobs run correctly):
+  let g:job_id = neural#job#Start(
+  \ neural#job#PrepareCommand(
+  \   bufnr(''),
+  \   has('win32') ? 'echo foo bar' : '/bin/sh -c ''echo foo bar'''
+  \ ),
+  \ {
+  \   'mode': 'nl',
+  \   'out_cb': function('CollectLine'),
+  \   'err_cb': {-> 0},
+  \   'exit_cb': function('ExitCallback'),
+  \ }
+  \)
+
+  Assert neural#job#IsRunning(g:job_id)
+
+  " Wait until command finishes.
+  while 1
+    sleep 1ms
+    let g:iterations += 1
+
+    if g:code != -1 || g:iterations >= 1000
+      break
+    endif
+  endwhile
+
+  AssertEqual 'foo bar', g:data
+  AssertEqual 0, g:code
+  Assert !neural#job#IsRunning(g:job_id)

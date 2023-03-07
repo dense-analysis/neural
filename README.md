@@ -34,33 +34,42 @@ them for a better experience.
 
 Add Neural to your runtime path in the usual ways.
 
+If you have trouble reading `:help neural`, try the following.
+
+```vim
+packloadall | silent! helptags ALL
+```
+
 #### Vim `packload`:
+
 ```bash
 git clone --depth 1 https://github.com/dense-analysis/neural.git ~/.vim/pack/git-plugins/start/neural
 ```
+
 #### Neovim `packload`:
+
 ```bash
 git clone --depth 1 https://github.com/dense-analysis/neural.git ~/.local/share/nvim/site/pack/git-plugins/start/neural
 ```
+
 #### Windows `packload`:
+
 ```bash
 git clone --depth 1 https://github.com/dense-analysis/neural.git ~/vimfiles/pack/git-plugins/start/neural
 ```
+
 #### [vim-plug](https://github.com/junegunn/vim-plug)
+
 ```vim
 Plug 'dense-analysis/neural'
     Plug 'muniftanjim/nui.nvim'
     Plug 'elpiloto/significant.nvim'
 ```
-#### [Vundle](https://github.com/VundleVim/Vundle.vim) 
+
+#### [Vundle](https://github.com/VundleVim/Vundle.vim)
+
 ```vim
 Plugin 'dense-analysis/neural'
-```
-
-If you have trouble reading `:help neural`, try the following.
-
-```vim
-packloadall | silent! helptags ALL
 ```
 
 ## 🚀 Usage

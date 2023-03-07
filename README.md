@@ -7,7 +7,7 @@ OpenAI for blazingly fast text and code generation.
 
 ## 🌟 Features
 
-* Generate text easy `:Neural write a story`
+* Generate text easily `:Neural write a story`
 * Support for multiple machine learning models
 * Compatible with Vim 8.0+ & Neovim 0.8+
 * Supported on Linux, Mac OSX, and Windows

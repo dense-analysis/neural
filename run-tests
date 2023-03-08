@@ -131,6 +131,7 @@ while [ $# -ne 0 ]; do
         echo '  --linters-only    Run only Vint and custom checks'
         echo '  --python-only     Run only Python checks'
         echo '  --fast            Run only the fastest Vim and the rest'
+        echo '  --no-docker       Run test scripts on host, except for Vim'
         echo '  --help            Show this help text'
         echo '  --                Stop parsing options after this'
         exit 0

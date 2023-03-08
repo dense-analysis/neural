@@ -1,17 +1,250 @@
-WIP
+*neural-development.txt*  For Vim and Neovim.
+*neural-dev*
+*neural-development*
 
-Make sure all required Python versions for testing are installed.
+Neural Development Documentation
 
+===============================================================================
+CONTENTS                                          *neural-development-contents*
+
+  1. Introduction.........................|neural-development-introduction|
+  2. Design Goals.........................|neural-design-goals|
+  3. Coding Standards.....................|neural-coding-standards|
+  4. Development Environment..............|neural-development-environment|
+  5. Testing Neural.......................|neural-development-tests|
+  6. Contributing.........................|neural-development-contributing|
+    6.1. Preparing a Release..............|neural-development-release|
+
+
+===============================================================================
+1. Introduction                               *neural-development-introduction*
+
+This document contains helpful information for Neural developers, including
+design goals, information on how to run the tests, coding standards, and so
+on. You should read this document if you want to get involved with Neural
+development.
+
+
+===============================================================================
+2. Design Goals                                           *neural-design-goals*
+
+This section lists design goals for Neural, in no particular order. They are as
+follows.
+
+Neural code should be mostly VimL to maintain compatibility with Vim,
+in some part Lua to permit better functionality for Neovim, and Python using
+absolutely zero dependencies. Using Python without anything but first party
+library functions allows Neural to run if it can find any system-installed
+Python of a reasonable version, with no further installation steps required.
+
+Neural should run without needing any other Vim plugins to be installed, to
+keep installation simple. Neural can integrate with other plugins for more
+advanced functionality, non-essential functionality, or improving on basic
+first party functionality.
+
+Neural should be free of breaking changes to the public API, which is
+comprised of documented functions and options, until a major version is
+planned. Breaking changes should be preceded by a deprecation phase complete
+with warnings. Changes required for security may be an exception.
+
+Neural supports Vim 8 and above, and Neovim 0.8.0 or newer. Vim 8 is the
+earliest version of Vim which supports |job|, |timer|, |closure|, and |lambda|
+features. Neovim 0.8.0 is the earliest version to support moderately good UI
+features users now expect for a plugin like Neural.
+
+Just about everything should be documented and covered with tests.
+
+By and large, people shouldn't pay for the functionality they don't use. Care
+should be taken when adding new features, so supporting new features doesn't
+degrade the general performance of anything Neural does.
+
+
+===============================================================================
+3. Coding Standards                                   *neural-coding-standards*
+
+The following general coding standards should be adhered to for Vim code.
+
+* Check your Vim code with `Vint` and do everything it says. ALE will check
+  your Vim code with Vint automatically. See: https://github.com/Kuniwak/vint
+* Try to write descriptive and concise names for variables and functions.
+  Names shouldn't be too short or too long. Think about others reading your
+  code later on.
+* Use `snake_case` names for variables and arguments, and `PascalCase` names
+  for functions. Prefix every variable name with its scope. (`l:`, `g:`, etc.)
+* Try to keep lines no longer than 80 characters, but this isn't an absolute
+  requirement.
+* Use 4 spaces for every level of indentation in Vim code.
+* Add a blank line before every `function`, `if`, `for`, `while`, or `return`,
+  which doesn't start a new level of indentation. This makes the logic in
+  your code easier to follow.
+* End every file with a trailing newline character, but not with extra blank
+  lines. Remove trailing whitespace from the ends of lines.
+* Write the full names of commands instead of abbreviations. For example, write
+  `function` instead of `func`, and `endif` instead of `end`.
+* Write functions with `!`, so files can be reloaded. Use the |abort| keyword
+  for all functions, so functions exit on the first error.
+* Make sure to credit yourself in files you have authored with `Author:`
+  and `Description:` comments.
+
+The following general coding standards should be adhered to for Python code.
+
+* Make sure to run `flake8` on code, and adhere to typical PEP8 coding
+  standards.
+* Make sure to run `pyright` on code, and ensure your code passes type
+  checking rules.
+* Make sure to run `isort` on code to keep imports sorted.
+* Maintain near 100% test coverage of Python code with `unittest` tests.
+* You may only use first party Python libraries.
+* Try to make sure code will run with whatever version of Python Debian stable
+  runs.
+
+NOTE: We do not currently offer guidelines for Lua code.
+
+Apply the following guidelines when writing Vader test files.
+
+* Use 2 spaces for Vader test files, instead of the 4 spaces for Vim files.
+* If you write `Before` and `After` blocks, you should typically write them at
+  the top of the file, so they run for all tests. There may be some tests
+  where it make sense to modify the `Before` and `After` code part of the way
+  through the file.
+* If you modify any settings or global variables, reset them in `After`
+  blocks. The Vader `Save` and `Restore` commands can be useful for this
+  purpose.
+* Just write `Execute` blocks for Vader tests, and don't bother writing `Then`
+  blocks. `Then` blocks execute after `After` blocks in older versions, and
+  that can be confusing.
+
+Apply the following rules when writing Bash scripts.
+
+* Run `shellcheck`, (ALE will run it) and do everything it says.
+  See: https://github.com/koalaman/shellcheck
+* Try to write scripts so they will run on Linux, BSD, or Mac OSX.
+
+
+===============================================================================
+4. Development Environment                     *neural-development-environment*
+
+You can run `tox` without Docker if you install the required Python versions.
 Neural tests against Python 3.7 and Python 3.10.
 
 Run the following: >
   python -m pip install --user tox==4.4.5
   python -m tox
 <
-
 To get the same configuration in your editor, run `./install-python-env.sh`.
-ALE should pick up on how to run `ruff` and `pyright` automatically.
+ALE should pick up on how to run `flake8` and `pyright` automatically, but you
+may wish to configure ALE to run only those linters. You can configure ALE
+to fix the Python files with `isort`. Apply the following settings: >
 
+  if expand('%:p') =~# 'neural'
+    let b:ale_linters = ['flake8', 'pyright']
+    let b:ale_fixers = ['isort']
+  endif
+<
+
+===============================================================================
+5. Testing Neural                     *neural-development-tests* *neural-tests*
+
+Neural is tested with a suite of tests executed via GitHub Actions.
+Neural runs tests with the following versions of Vim.
+
+1. Vim 8.0.0027 on Linux.
+2. Vim 9.0.0297 on Linux.
+3. NeoVim 0.8.0 on Linux.
+
+If you are developing Neural code on Linux, Mac OSX, or BSD, you can run
+Neural's tests by installing Docker and running the `run-tests` script. Follow
+the instructions on the Docker site for installing Docker.
+See: https://docs.docker.com/install/
+
+NOTE: Don't forget to add your user to the `docker` group on Linux, or Docker
+just won't work. See: https://docs.docker.com/install/linux/linux-postinstall/
+
+If you run simply `./run-tests` from the Neural repository root directory, the
+latest Docker image for tests will be downloaded if needed, and the script
+will run all of the tests in Vader, Vint checks, `tox`, and several Bash
+scripts for finding extra issues. Run `./run-tests --help` to see all of the
+options the script supports. The script supports selecting particular test
+files.
+
+Once you get used to dealing with Vim and Neovim compatibility issues, you
+probably want to use `./run-tests --fast -q` for running tests with only the
+fastest available Vim version, and with success messages from tests
+suppressed.
+
+Generally write tests for any changes you make.
+
+Look at existing tests in the codebase for examples of how to write tests.
+Refer to the Vader documentation for general information on how to write Vader
+tests: https://github.com/junegunn/vader.vim
+
+
+===============================================================================
+6. Contributing                               *neural-development-contributing*
+
+All integration of new code into Neural is done through GitHub pull requests.
+Using that tool streamlines the process and minimizes the time and effort
+required to e.g. ensure test suites are run for every change.
+
+As for any project hosted by GitHub, the choice of platform demands every
+contributor to take care to setup an account and configure it accordingly.
+
+Due to details of our process, a difference to many other GitHub hosted
+projects is that contributors who wish to keep the author fields for their
+commits unaltered need to configure a public email address in their account
+and profile settings. See: https://docs.github.com/en/account-and-profile/
+
+Unless configuring GitHub to expose contact details, commits will be rewritten
+to appear by `USERNAME <RANDOM_NUMBER+USERNAME@users.noreply.github.com>` .
+
+
+-------------------------------------------------------------------------------
+6.1 Preparing a Release                            *neural-development-release*
+
+Neural offers release packages through GitHub, for two reasons:
+
+1. Some users like to target specific release versions rather than simply
+   installing the plugin from `master`. This includes users who create Linux
+   distribution specific packages from GitHub releases.
+2. The releases provide a nice way to get an overview of what has changed in
+   Neural over time.
+
+Neural has no fixed release schedule. Release versions are created whenever
+the Neural developers feel the need to create one. Neural release versions
+follow the typical Semantic Versioning scheme. See: https://semver.org/
+
+If there are ever to be any breaking changes made for Neural, there should
+first come a minor version release for Neural documenting all of the coming
+breaking changes to Neural. It should be described how users can prepare for a
+breaking change that is coming before it is done. At the time of writing,
+Neural lives as version 0.x.x, and as such breaking changes may be more
+common.
+
+To create a release for Neural, you will need sufficient permissions in GitHub.
+Once you do, follow these steps.
+
+1. Create a new release draft, or edit an existing one. It helps to craft
+   drafts ahead of time and write the last commit ID checked for release notes
+   on the last update to a draft.
+   See the releases page: https://github.com/dense-analysis/neural/releases
+2. Examine `git log` and read changes made between the last ID checked, or the
+   git tag of the previous release, and the current commit in `master`.
+3. Write updates in separate sections (except where empty) for:
+  3.a. New Features
+  3.b. Bugs Fixed
+4. Commit the changes after `./run-tests --fast -q` passes.
+5. Tag the release with `git tag vA.B.C`, replacing `A`, `B`, and `C` with the
+   version numbers. See `git tag --list` for examples.
+6. Run `git push` and `git push --tags` to push the commit and the tag.
+7. Edit the release draft in GitHub, select the tag you just pushed, and
+   publish the draft.
+8. If you're creating a new major or minor version: `git checkout -b vA.B.x`,
+   replacing `A` and `B` with the major and minor versions. `git push` the new
+   branch, and the GitHub branch protection settings should automatically
+   apply to the new release branch.
+9. You have already completed the last step.
+
+Have fun creating Neural releases. Use your head, or Neural in place of it.
 
 ===============================================================================
   vim:tw=78:ts=2:sts=2:sw=2:ft=help:norl:

@@ -12,8 +12,17 @@ echo '========================================'
 echo 'tox warnings/errors follow:'
 echo
 
+tox_command='tox --workdir .tox-docker --skip-missing-interpreters=false'
+
 set -o pipefail
-docker run -a stdout "${docker_flags[@]}" tox --workdir .tox-docker --skip-missing-interpreters=false || exit_code=$?
+
+if [ "$NO_DOCKER" -ne 1 ]; then
+    # shellcheck disable=2086
+    docker run -a stdout "${docker_flags[@]}" $tox_command || exit_code=$?
+else
+    $tox_command || exit_code=$?
+fi
+
 set +o pipefail
 
 exit $exit_code

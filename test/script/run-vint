@@ -3,6 +3,8 @@
 set -e
 set -u
 
+required_version='0.3.21'
+
 exit_code=0
 docker_flags=(--rm -v "$PWD:/testplugin" -v "$PWD/test:/home" -w /testplugin "$DOCKER_RUN_IMAGE")
 
@@ -15,8 +17,20 @@ echo
 vint='/root/.pyenv/versions/3.10.10/bin/vint'
 
 set -o pipefail
-docker run -a stdout "${docker_flags[@]}" "$vint" -s autoload plugin || exit_code=$?
+
+if [ "$NO_DOCKER" -ne 1 ]; then
+    docker run -a stdout "${docker_flags[@]}" "$vint" -s autoload plugin || exit_code=$?
+else
+    if [ "$(vint --version)" != "$required_version" ]; then
+        echo "You have have vint $(vint --version), but you need $required_version" 1>&2
+        exit 1
+    fi
+
+    vint -s autoload plugin || exit_code=$?
+fi
+
 set +o pipefail
+
 echo
 
 exit "$exit_code"

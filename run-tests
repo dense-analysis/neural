@@ -31,6 +31,10 @@ run_vim_90_tests=1
 run_linters=1
 run_python=1
 
+# --no-docker can be set to disable docker wherever possible.
+# This doesn't apply to Vim at the moment, but we can skip the build stage.
+NO_DOCKER=0
+
 while [ $# -ne 0 ]; do
     case $1 in
     -v)
@@ -105,6 +109,10 @@ while [ $# -ne 0 ]; do
         run_python=1
         shift
     ;;
+    --no-docker)
+        NO_DOCKER=1
+        shift
+    ;;
     --help)
         echo 'Usage: ./run-tests [OPTION]... [FILE]...'
         echo
@@ -141,6 +149,8 @@ while [ $# -ne 0 ]; do
     esac
 done
 
+export NO_DOCKER
+
 # Allow tests to be passed as arguments.
 if [ $# -ne 0 ]; then
     # This doesn't perfectly handle work splitting, but none of our files
@@ -156,9 +166,11 @@ find test -name '*.swp' -delete
 
 set -eu
 
-# Check if docker un image is available locally
-has_image=$(docker images --quiet "${image}:${image_tag}" | wc -l)
-arch=$(docker info -f '{{ .Architecture }}')
+if [ $NO_DOCKER -ne 1 ]; then
+    # Check if docker un image is available locally
+    has_image=$(docker images --quiet "${image}:${image_tag}" | wc -l)
+    arch=$(docker info -f '{{ .Architecture }}')
+fi
 
 download_image() {
   if [[ $arch != x86_64 ]]; then
@@ -169,7 +181,7 @@ download_image() {
   docker pull "${image}:${image_tag}" &> /dev/null
 }
 
-if [ "$has_image" -eq 0 ] && ! download_image; then
+if [ $NO_DOCKER -ne 1 ] && [ "$has_image" -eq 0 ] && ! download_image; then
   echo "Building run image ${image}:${image_tag}"
 
   build_args=( --build-arg GIT_VERSION="$git_version" )
@@ -195,7 +207,9 @@ else
   echo "Docker run image ${image}:${image_tag} ready"
 fi
 
-docker tag "${image}:${image_tag}" "${image}:latest"
+if [ $NO_DOCKER -ne 1 ]; then
+    docker tag "${image}:${image_tag}" "${image}:latest"
+fi
 
 output_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 

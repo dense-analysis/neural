@@ -1,0 +1,161 @@
+Before:
+  Save g:neural
+
+  runtime autoload/neural/job.vim
+
+  unlet! g:neural
+  let g:job_id = 0
+  let g:calls = []
+  let g:OutCb = {->0}
+  let g:ErrCb = {->0}
+  let g:ExitCb = {->0}
+  let g:captured_output = ''
+
+  function! neural#job#Start(command, options) abort
+    let g:job_id += 1
+    call add(g:calls, ['neural#job#Start'])
+
+    let g:OutCb = a:options.out_cb
+    let g:ErrCb = a:options.err_cb
+    let g:ExitCb = a:options.exit_cb
+
+    return g:job_id
+  endfunction
+
+  function! neural#job#IsRunning(job_id) abort
+    return g:job_id == a:job_id
+  endfunction
+
+  function! neural#job#SendRaw(job_id, string) abort
+    call add(g:calls, ['neural#job#SendRaw', a:job_id, a:string])
+  endfunction
+
+  function! neural#job#Stop(job_id) abort
+    call add(g:calls, ['neural#job#Stop', a:job_id])
+  endfunction
+
+  redir => g:captured_output
+  call neural#ResetState()
+
+After:
+  redir END
+
+  unlet! g:job_id
+  unlet! g:calls
+  unlet! g:OutCb
+  unlet! g:ErrCb
+  unlet! g:ExitCb
+
+  augroup WritePostGroup
+    autocmd!
+  augroup END
+
+  runtime autoload/neural/job.vim
+
+Given text (A file with two lines and a blank line in the middle):
+  First line
+
+  Third line
+Execute(Running Neural and collecting output should work):
+  call cursor(2, 1)
+
+  Neural this is a test
+  sleep 1ms
+  call timer_stopall()
+
+  augroup WritePostGroup
+    autocmd!
+    autocmd User NeuralWritePost :call add(g:calls, ['NeuralWritePost'])
+  augroup END
+
+  call g:OutCb(g:job_id, "first output line")
+  call g:OutCb(g:job_id, "second output line")
+  call g:ExitCb(g:job_id, 0)
+
+  AssertEqual
+  \ [
+  \   'First line',
+  \   'first output line',
+  \   'second output line',
+  \   '',
+  \   'Third line',
+  \ ],
+  \ getline(1, '$')
+
+  call neural#Cleanup()
+
+  redir END
+
+  AssertEqual
+  \ [
+  \   ['neural#job#Stop', 0],
+  \   ['neural#job#Start'],
+  \   [
+  \     'neural#job#SendRaw',
+  \     1,
+  \     json_encode({
+  \       'config': g:neural.source.openai,
+  \       'prompt': 'this is a test',
+  \     }) . "\n",
+  \   ],
+  \   ['NeuralWritePost'],
+  \   ['neural#job#Stop', 1],
+  \ ],
+  \ g:calls
+
+  AssertEqual
+  \ join(['', 'Neural is working...', 'Neural is done!'], "\n"),
+  \ g:captured_output
+
+Execute(Neural should print single line errors correctly):
+  Neural this is a test
+  sleep 1ms
+  call timer_stopall()
+
+  call g:ErrCb(g:job_id, "error line")
+  call g:ExitCb(g:job_id, 1)
+
+  call neural#Cleanup()
+
+  redir END
+
+  AssertEqual
+  \ join(['', 'Neural is working...', 'error line'], "\n"),
+  \ g:captured_output
+
+Execute(Neural should print multi line errors correctly):
+  Neural this is a test
+  sleep 1ms
+  call timer_stopall()
+
+  call g:ErrCb(g:job_id, "error line")
+  call g:ErrCb(g:job_id, "second line")
+  call g:ExitCb(g:job_id, 1)
+
+  call neural#Cleanup()
+
+  redir END
+
+  AssertEqual
+  \ join(
+  \   [
+  \     '',
+  \     'Neural is working...',
+  \     'error line',
+  \     'second line',
+  \     'Neural hit a snag! Type :mes to see why',
+  \   ],
+  \   "\n"
+  \ ),
+  \ g:captured_output
+
+Execute(It should be possible to disable echo messages):
+  let g:neural = {'ui': {'echo_enabled': 0}}
+  Neural this is a test
+  sleep 1ms
+  call timer_stopall()
+  call g:ExitCb(g:job_id, 1)
+  call neural#Cleanup()
+  redir END
+
+  AssertEqual '', g:captured_output

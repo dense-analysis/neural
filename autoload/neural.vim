@@ -8,6 +8,12 @@ let s:current_job = get(s:, 'current_job', 0)
 " Keep track of the line the last request happened on.
 let s:request_line = get(s:, 'request_line', 0)
 
+" A function purely for tests to be able to reset state
+function! neural#ResetState() abort
+    let s:current_job = 0
+    let s:request_line = 0
+endfunction
+
 " Get the Neural scripts directory in a way that makes it hard to modify.
 function! neural#GetScriptDir() abort
     return s:neural_script_dir
@@ -28,7 +34,6 @@ function! s:OutputErrorMessage(message) abort
 
         try
             for l:line in l:lines
-                " FIXME: This can cause "Press Enter to continue..."
                 " no-custom-checks
                 echomsg l:line
             endfor

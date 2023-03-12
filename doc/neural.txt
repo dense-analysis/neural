@@ -8,6 +8,7 @@ CONTENTS                                                      *neural-contents*
   2. Supported Tools......................|neural-support|
   3. Options..............................|neural-options|
     3.1 OpenAI............................|neural-openai|
+    3.2 ChatGPT...........................|neural-chatgpt|
   4. Commands/Keybinds....................|neural-commands|
   5. API..................................|neural-api|
   6. Environment Variables................|neural-env|
@@ -78,6 +79,7 @@ g:neural.selected                                           *g:neural.selected*
   Selects a source for Neural to use. Possible values are:
 
   1. `'openai'` - OpenAI
+  2. `'chatgpt'` - ChatGPT
 
 
 g:neural.ui.echo_enabled                             *g:neural.ui.echo_enabled*
@@ -199,6 +201,64 @@ g:neural.source.openai.top_p                     *g:neural.source.openai.top_p*
   are considered.
 
   OpenAI recommends altering this or temperature but not both.
+
+
+-------------------------------------------------------------------------------
+3.2 ChatGPT                                                    *neural-chatgpt*
+
+Options for configuring ChatGPT are listed below.
+
+Many options are simliar to OpenAI completion options above.
+
+
+g:neural.source.chatgpt.api_key               *g:neural.source.chatgpt.api_key*
+                                          *vim.g.neural.source.chatgpt.api_key*
+  Type: |String|
+  Default: `''`
+
+  The OpenAI API key. See: https://beta.openai.com/signup/
+
+
+g:neural.source.chatgpt.frequency_penalty
+                                    *g:neural.source.chatgpt.frequency_penalty*
+                                *vim.g.neural.source.chatgpt.frequency_penalty*
+  Type: |Number| or |Float|
+  Default: `0.1`
+
+  See Also: |g:neural.source.openai.frequency_penalty|
+
+
+g:neural.source.chatgpt.max_tokens         *g:neural.source.chatgpt.max_tokens*
+                                       *vim.g.neural.source.chatgpt.max_tokens*
+  Type: |Number|
+  Default: `2048`
+
+  See Also: |g:neural.source.openai.max_tokens|
+
+
+g:neural.source.chatgpt.presence_penalty
+                                     *g:neural.source.chatgpt.presence_penalty*
+                                 *vim.g.neural.source.chatgpt.presence_penalty*
+  Type: |Number| or |Float|
+  Default: `0.1`
+
+  See Also: |g:neural.source.openai.presence_penalty|
+
+
+g:neural.source.chatgpt.temperature       *g:neural.source.chatgpt.temperature*
+                                      *vim.g.neural.source.chatgpt.temperature*
+  Type: |Number| or |Float|
+  Default: `0.2`
+
+  See Also: |g:neural.source.openai.temperature|
+
+
+g:neural.source.chatgpt.top_p                   *g:neural.source.chatgpt.top_p*
+                                            *vim.g.neural.source.chatgpt.top_p*
+  Type: |Number| or |Float|
+  Default: `1`
+
+  See Also: |g:neural.source.openai.top_p|
 
 
 ===============================================================================

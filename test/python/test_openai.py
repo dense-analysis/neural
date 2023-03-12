@@ -90,13 +90,13 @@ def test_print_openai_results():
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "\\n", "index": 0, "logprobs": null, "finish_reason": null}], "model": "text-davinci-003"}\n'  # noqa
         b'\n'
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "Hello", "index": 0, "logprobs": null, "finish_reason": null}], "model": "text-davinci-003"}\n'  # noqa
+        b'\n'
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "!", "index": 0, "logprobs": null, "finish_reason": null}], "model": "text-davinci-003"}\n'  # noqa
         b'\n'
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "", "index": 0, "logprobs": null, "finish_reason": "stop"}], "model": "text-davinci-003"}\n'  # noqa
         b'\n'
         b'data: [DONE]\n'
         b'\n'
-        b''
     )
 
     with mock.patch.object(sys.stdin, 'readline') as readline_mock, \

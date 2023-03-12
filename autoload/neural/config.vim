@@ -3,9 +3,7 @@ scriptencoding utf-8
 " Description: Configuration of Neural with a default config.
 
 " Track modifications to g:neural, in case we set it again.
-if !exists('s:last_dictionary')
-    let s:last_dictionary = {}
-endif
+let s:last_dictionary = get(s:, 'last_dictionary', {})
 
 let s:defaults = {
 \   'selected': 'openai',
@@ -24,6 +22,14 @@ let s:defaults = {
 \           'presence_penalty': 0.1,
 \           'frequency_penalty': 0.1,
 \       },
+\       'chatgpt': {
+\           'api_key': '',
+\           'temperature': 0.2,
+\           'top_p': 1,
+\           'max_tokens': 2048,
+\           'presence_penalty': 0.1,
+\           'frequency_penalty': 0.1,
+\       },
 \   },
 \}
 
@@ -39,10 +45,16 @@ function! neural#config#DeepMerge(into, from) abort
     return a:into
 endfunction
 
+function! s:ApplySpecialDefaults() abort
+    if empty(g:neural.source.chatgpt.api_key)
+        let g:neural.source.chatgpt.api_key = g:neural.source.openai.api_key
+    endif
+endfunction
+
 " Set the shared configuration for Neural.
 function! neural#config#Set(settings) abort
-    let g:neural = neural#config#DeepMerge(deepcopy(s:defaults), a:settings)
-    let s:last_dictionary = g:neural
+    let g:neural = a:settings
+    call neural#config#Load()
 endfunction
 
 function! neural#config#Load() abort
@@ -54,7 +66,7 @@ function! neural#config#Load() abort
         \   deepcopy(s:defaults),
         \   l:dictionary,
         \)
+        let g:neural = s:last_dictionary
+        call s:ApplySpecialDefaults()
     endif
-
-    let g:neural = s:last_dictionary
 endfunction

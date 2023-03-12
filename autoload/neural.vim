@@ -188,12 +188,12 @@ function! neural#Cleanup() abort
     endif
 endfunction
 
-function! neural#Prompt(prompt_text) abort
+function! neural#Prompt(prompt) abort
     " Reload the Neural config on a prompt request if needed.
     call neural#config#Load()
     call neural#Cleanup()
 
-    if empty(a:prompt_text)
+    if empty(a:prompt)
         if has('nvim') && g:neural.ui.prompt_enabled
             call neural#OpenPrompt()
         else
@@ -221,7 +221,7 @@ function! neural#Prompt(prompt_text) abort
         let l:config = {}
     endif
 
-    let l:input = {'config': l:config, 'prompt': a:prompt_text}
+    let l:input = {'config': l:config, 'prompt': a:prompt}
     let l:buffer = bufnr('')
     let l:moving_line = getpos('.')[1]
     let s:request_line = l:moving_line

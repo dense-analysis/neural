@@ -93,3 +93,13 @@ Execute(Settings should update when g:neural is changed):
 
   AssertEqual 'mykey', g:neural.source.openai.api_key
   AssertEqual 0.2, g:neural.source.openai.temperature
+
+Execute(The chatgpt api_key should default to the openai api_key):
+  call neural#config#Set({
+  \ 'ui': {'echo_enabled': v:true},
+  \ 'source': {
+  \   'openai': {'api_key': 'mykey'},
+  \ },
+  \})
+
+  AssertEqual 'mykey', g:neural.source.chatgpt.api_key

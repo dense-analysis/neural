@@ -2,8 +2,8 @@
 
 ![Vim](https://img.shields.io/badge/VIM-%2311AB00.svg?style=for-the-badge&logo=vim&logoColor=white) ![Neovim](https://img.shields.io/badge/NeoVim-%2357A143.svg?&style=for-the-badge&logo=neovim&logoColor=white) [![CI](https://img.shields.io/github/actions/workflow/status/dense-analysis/neural/main.yml?branch=main&label=CI&logo=github&style=for-the-badge)](https://github.com/dense-analysis/neural/actions?query=event%3Apush+workflow%3ACI+branch%3Amain++) [![Join the Dense Analysis Discord server](https://img.shields.io/badge/chat-Discord-5865F2?style=for-the-badge&logo=appveyor)](https://discord.gg/5zFD6pQxDk)
 
-Neural is Vim and Neovim plugin integrating machine learning models including
-OpenAI for blazingly fast text and code generation.
+Neural is a Vim/Neovim plugin integration machine learning models including
+OpenAI completions and ChatGPT for blazingly fast text and code generation.
 
 ## 🌟 Features
 

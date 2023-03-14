@@ -1,0 +1,65 @@
+Before:
+  Save g:neural
+
+  runtime autoload/neural.vim
+
+  unlet! g:neural
+
+  let g:calls = []
+
+  function! neural#Run(prompt, options) abort
+    call add(g:calls, ['neural#Run', a:prompt, a:options])
+  endfunction
+
+After:
+  unlet! g:calls
+
+  runtime autoload/neural/job.vim
+
+  Restore
+
+Execute(It should create a neural buffer with default settings):
+  NeuralBuffer
+
+  AssertEqual bufexists('Neural Buffer'), 1
+  AssertEqual &filetype, 'neuralbuf'
+  " TODO: Assert if created with new or vertical new
+  AssertEqual &l:wrap, 1
+  AssertEqual &l:linebreak, 1
+
+  bdelete! Neural Buffer
+
+Execute(It should create a neural buffer with arguments):
+  NeuralBuffer {"name": "Test Name", "create_mode": "horizontal", "wrap": v:false}
+
+  AssertEqual bufexists('Test Name'), 1
+  AssertEqual &filetype, 'neuralbuf'
+  " TODO: Assert if created with new or vertical new
+  AssertEqual &l:wrap, 0
+  AssertEqual &l:linebreak, 0
+
+  bdelete! Test Name
+
+Given neuralbuf(A Neural buffer):
+  write a story
+Execute(It should correctly run neural):
+  NeuralRun
+
+  AssertEqual
+  \ [
+  \   ['neural#Run', 'write a story', {'line': 1, 'echo': 0}],
+  \ ],
+  \ g:calls
+
+
+" Plug mappings
+Execute(The correct neural buffer keybinds should be configured):
+  redir => g:output
+    silent map <Plug>(neural_completion)
+  redir END
+
+  AssertEqual
+  \ [
+  \   'n  <Plug>(neural_completion) *@:NeuralRun<CR>',
+  \ ],
+  \ sort(split(g:output, "\n"))

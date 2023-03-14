@@ -5,3 +5,5 @@
 /env
 __pycache__
 tags
+# pyenv
+.python-version

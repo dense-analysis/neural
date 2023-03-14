@@ -66,6 +66,19 @@ Execute(The default chatgpt settings should be correct):
   \ },
   \ get(g:neural.source, 'chatgpt')
 
+Execute(The default neural buffer settings should be correct):
+  call neural#config#Load()
+  " call filter(g:neural.buffer, {key -> key =~ 'completion'})
+  "
+  " AssertEqual {'echo_enabled': v:true}, g:neural.ui
+  AssertEqual
+  \ {
+  \   'completion_key': '\<C-CR>',
+  \   'create_mode': 'vertical',
+  \   'wrap': v:true,
+  \ },
+  \ get(g:neural, 'buffer')
+
 Execute(Settings should be merged correctly):
   for s:i in range(2)
     if s:i == 0

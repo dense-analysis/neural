@@ -14,5 +14,6 @@ if !has('win32')
 endif
 
 set nocompatible
+filetype plugin on
 " The encoding must be explicitly set for tests for Windows.
 execute 'set encoding=utf-8'

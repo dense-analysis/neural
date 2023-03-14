@@ -33,12 +33,17 @@ endif
 command! -nargs=? Neural :call neural#Prompt(<q-args>)
 " Stop Neural doing anything.
 command! -nargs=0 NeuralStop :call neural#Stop()
+" Create a completion buffer.
+command! -nargs=? NeuralBuffer :call neural#buffer#CreateBuffer(<q-args>)
+" Run completion on a Neural buffer.
+command! -nargs=0 NeuralBufferRun :call neural#buffer#RunBuffer()
 " Have Neural explain the visually selected lines.
 command! -range NeuralExplain :call neural#explain#SelectedLines()
 
 " <Plug> mappings for commands
 nnoremap <silent> <Plug>(neural_prompt) :call neural#OpenPrompt()<Return>
 nnoremap <silent> <Plug>(neural_stop) :call neural#Stop()<Return>
+nnoremap <silent> <Plug>(neural_buffer) :call neural#buffer#CreateBuffer({})<Return>
 vnoremap <silent> <Plug>(neural_explain) :NeuralExplain<Return>
 
 " Set default keybinds for Neural unless we're told not to. We should almost

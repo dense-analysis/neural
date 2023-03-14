@@ -1,5 +1,3 @@
-local next = next
-
 -- External dependencies
 local UI = {}
 local AnimatedSign = {}

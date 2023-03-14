@@ -203,6 +203,10 @@ function! neural#Prompt(prompt) abort
         return
     endif
 
+    call neural#Run(a:prompt, {})
+endfunction
+
+function! neural#Run(prompt, options) abort
     let l:selected = g:neural.selected
     let l:GetDatasource = function('neural#source#' . selected . '#Get')
 
@@ -223,7 +227,13 @@ function! neural#Prompt(prompt) abort
 
     let l:input = {'config': l:config, 'prompt': a:prompt}
     let l:buffer = bufnr('')
-    let l:moving_line = getpos('.')[1]
+
+    if has_key(a:options, 'line')
+        let l:moving_line = a:options.line
+    else
+        let l:moving_line = getpos('.')[1]
+    endif
+
     let s:request_line = l:moving_line
 
     if len(getline(l:moving_line)) == 0
@@ -260,7 +270,7 @@ function! neural#Prompt(prompt) abort
     let s:current_job = l:job_id
 
     " Tell the user something is happening, if enabled.
-    if g:neural.ui.echo_enabled
+    if g:neural.ui.echo_enabled && get(a:options, 'echo', 1)
         " Echo with a 0 millisecond timer to avoid 'Press Enter to Continue'
         call timer_start(0, {-> s:InitiallyInformUser(l:job_id)})
 

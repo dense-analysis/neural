@@ -13,6 +13,9 @@ let s:defaults = {
 \       'animated_sign_enabled': v:true,
 \       'echo_enabled': v:true,
 \   },
+\   'buffer': {
+\       'run_key': "\<C-CR>",
+\   },
 \   'source': {
 \       'openai': {
 \           'api_key': '',

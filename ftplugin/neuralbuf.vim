@@ -5,6 +5,10 @@ command! -buffer -nargs=0 NeuralRun :call neural#buffer#RunBuffer()
 nnoremap <buffer> <Plug>(neural_run) :NeuralRun<Return>
 
 " Keybindings of Neural Buffer
-nnoremap <C-CR> <Plug>(neural_run)
-inoremap <C-CR> <Esc><Plug>(neural_run)
-
+if exists('*keytrans')
+    execute 'nnoremap ' . keytrans(g:neural.buffer.run_key) . ' <Plug>(neural_run)'
+    execute 'inoremap ' . keytrans(g:neural.buffer.run_key) . ' <Esc><Plug>(neural_run)'
+else
+    nnoremap <C-CR> <Plug>(neural_run)
+    inoremap <C-CR> <Esc><Plug>(neural_run)
+endif

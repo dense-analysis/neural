@@ -30,8 +30,8 @@ if !s:has_features
 endif
 
 command! -nargs=? Neural :call neural#Prompt(<q-args>)
-command! -nargs=0 NeuralBuffer call neural#buffer#CreateBuffer()
-command! -nargs=0 NeuralBufferRun call neural#buffer#RunBuffer()
+command! -nargs=0 NeuralBuffer :call neural#buffer#CreateBuffer()
 
 " <Plug> mappings for commands
 nnoremap <Plug>(neural_prompt) :call neural#OpenPrompt()<Return>
+nnoremap <Plug>(neural_buffer) :call neural#buffer#CreateBuffer()<Return>

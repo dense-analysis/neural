@@ -21,7 +21,7 @@ git_version=$(git describe --always --tags)
 DOCKER_RUN_IMAGE="$image:$image_tag"
 export DOCKER_RUN_IMAGE
 
-tests='test/vim/*.vader'
+tests='test/vim/*.vader test/vim/*/*.vader'
 # These flags are forwarded to the script for running Vader tests.
 verbose_flag=''
 quiet_flag=''

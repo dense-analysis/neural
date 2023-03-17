@@ -52,6 +52,8 @@ After:
 
   runtime autoload/neural/job.vim
 
+  Restore
+
 Given text (A file with two lines and a blank line in the middle):
   First line
 

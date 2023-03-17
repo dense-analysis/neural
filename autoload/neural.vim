@@ -188,6 +188,22 @@ function! neural#Cleanup() abort
     endif
 endfunction
 
+" Pre-process input for LLMs based on custom code in Neural.
+function! neural#PreProcess(buffer, input) abort
+    " Skip pre-processing if disabled.
+    if !g:neural.pre_process.enabled
+        return
+    endif
+
+    for l:split_type in split(&filetype, '\.')
+        try
+            let l:func_name = 'neural#pre_process#' . l:split_type . '#Process'
+            call function(l:func_name)(a:buffer, a:input)
+        catch /E117/
+        endtry
+    endfor
+endfunction
+
 function! neural#Prompt(prompt) abort
     " Reload the Neural config on a prompt request if needed.
     call neural#config#Load()
@@ -239,6 +255,8 @@ function! neural#Run(prompt, options) abort
     if len(getline(l:moving_line)) == 0
         let l:moving_line -= 1
     endif
+
+    call neural#PreProcess(l:buffer, l:input)
 
     let l:script_exe = s:GetScriptExecutable(l:source)
     let l:command = neural#Escape(l:script_exe)

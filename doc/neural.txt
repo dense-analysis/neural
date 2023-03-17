@@ -82,6 +82,17 @@ g:neural.selected                                           *g:neural.selected*
   2. `'chatgpt'` - ChatGPT
 
 
+g:neural.pre_process.enabled                     *g:neural.pre_process.enabled*
+                                             *vim.g.neural.pre_process.enabled*
+  Type: |Boolean|
+  Default: `v:true`
+
+  If `v:true`, pre-process prompts before sending them to language models.
+
+  Neural edits the text you send automatically by default to improve the
+  quality of prompts to produce better results for each filetype.
+
+
 g:neural.ui.echo_enabled                             *g:neural.ui.echo_enabled*
                                                  *vim.g.neural.ui.echo_enabled*
   Type: |Boolean|

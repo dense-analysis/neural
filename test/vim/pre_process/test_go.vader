@@ -1,0 +1,19 @@
+Before:
+  let g:input = {'prompt': 'Do something.'}
+  call neural#config#Load()
+
+After:
+  unlet! g:input
+
+Given go(An empty Go file):
+Execute(Basic Go prompt editing should be done):
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write golang code. Do something.', g:input.prompt
+
+Given go(A go file with a package declaration):
+  package anything
+Execute(The prescence of a package should edit the prompt to not add a main function):
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write golang code. Do not write package main or main func. Do something.', g:input.prompt

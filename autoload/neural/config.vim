@@ -7,6 +7,9 @@ let s:last_dictionary = get(s:, 'last_dictionary', {})
 
 let s:defaults = {
 \   'selected': 'openai',
+\   'pre_process': {
+\       'enabled': v:true,
+\   },
 \   'ui': {
 \       'prompt_enabled': v:true,
 \       'prompt_icon': '🗲',

@@ -1,0 +1,12 @@
+Before:
+  let g:input = {'prompt': 'Do something.'}
+  call neural#config#Load()
+
+After:
+  unlet! g:input
+
+Given markdown(An empty Markdown file):
+Execute(Basic Markdown prompt editing should be done):
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write text in a markdown file. Do something.', g:input.prompt

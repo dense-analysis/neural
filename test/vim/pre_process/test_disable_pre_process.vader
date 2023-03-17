@@ -1,0 +1,20 @@
+Before:
+  Save g:neural
+
+  unlet! g:neural
+
+  let g:input = {'prompt': 'Do something.'}
+  call neural#config#Load()
+
+After:
+  unlet! g:input
+
+  Restore
+
+Given go(An empty Go file):
+Execute(It should be possible to disable pre-processing):
+  let g:neural.pre_process.enabled = 0
+
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Do something.', g:input.prompt

@@ -3,8 +3,10 @@
 /README.md export-ignore
 /env export-ignore
 /install-python-env.sh export-ignore
+/pyrightconfig.json export-ignore
 /run-tests export-ignore
 /run-tests.bat export-ignore
 /test export-ignore
 /test-requirements.txt export-ignore
 /tox.ini export-ignore
+/typings export-ignore

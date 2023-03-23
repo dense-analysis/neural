@@ -153,6 +153,8 @@ endfunction
 
 function! neural#OpenPrompt() abort
     if has('nvim')
+        " Reload the Neural config on a prompt request if needed.
+        call neural#config#Load()
         " In Neovim, try to use the fancy prompt UI, if we can.
         lua require('neural').prompt()
     else

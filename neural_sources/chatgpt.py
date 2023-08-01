@@ -25,6 +25,7 @@ class Config:
         max_tokens: int,
         presence_penalty: float,
         frequency_penalty: float,
+        model: str
     ):
         self.api_key = api_key
         self.temperature = temperature
@@ -32,6 +33,7 @@ class Config:
         self.max_tokens = max_tokens
         self.presence_penalty = presence_penalty
         self.frequency_penalty = frequency_penalty
+        self.model = model 
 
 
 def get_chatgpt_completion(
@@ -43,7 +45,7 @@ def get_chatgpt_completion(
         "Authorization": f"Bearer {config.api_key}"
     }
     data = {
-        "model": "gpt-3.5-turbo",
+        "model": config.model,
         "messages": (
             [{"role": "user", "content": prompt}]
             if isinstance(prompt, str) else
@@ -125,6 +127,11 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
     if not isinstance(frequency_penalty, (int, float)):
         raise ValueError("chatgpt.frequency_penalty is invalid")
 
+    model = raw_config.get('model', "gpt-3.5-turbo")
+
+    if not isinstance(model, str) or not model:  # type: ignore
+        raise ValueError("chatgpt.model is not defined")
+
     return Config(
         api_key=api_key,
         temperature=temperature,
@@ -132,6 +139,7 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
         max_tokens=max_tokens,
         presence_penalty=presence_penalty,
         frequency_penalty=presence_penalty,
+        model=model
     )
 
 

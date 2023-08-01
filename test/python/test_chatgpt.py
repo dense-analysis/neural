@@ -20,6 +20,7 @@ def get_valid_config() -> Dict[str, Any]:
         "max_tokens": 1,
         "presence_penalty": 1,
         "frequency_penalty": 1,
+        "model": 'gpt-3.5-turbo',
     }
 
 

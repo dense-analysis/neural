@@ -5,8 +5,8 @@ particular Vim commands. This script ensures that VimL scripts are padded
 correctly, so they are easier to read.
 """
 
-import sys
 import re
+import sys
 
 INDENTATION_RE = re.compile(r'^ *')
 COMMENT_LINE_RE = re.compile(r'^ *"')

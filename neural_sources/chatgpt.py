@@ -33,7 +33,7 @@ class Config:
         self.max_tokens = max_tokens
         self.presence_penalty = presence_penalty
         self.frequency_penalty = frequency_penalty
-        self.model = model 
+        self.model = model
 
 
 def get_chatgpt_completion(

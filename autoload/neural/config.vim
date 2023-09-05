@@ -10,6 +10,7 @@ let s:defaults = {
 \   'pre_process': {
 \       'enabled': v:true,
 \   },
+\   'set_default_keybinds': v:true,
 \   'ui': {
 \       'prompt_enabled': v:true,
 \       'prompt_icon': '🗲',

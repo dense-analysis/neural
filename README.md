@@ -107,6 +107,12 @@ Try typing `:Neural say hello`, and if all goes well the machine learning
 tool will say "hello" to you in the current buffer. Type `:help neural` to
 see the full documentation.
 
+You can stop Neural from working by with the `NeuralStop` command. Unless
+another keybind for `<C-c>` (CTRL+C) is defined in normal mode, Neural will run
+the stop command by default when you enter that key combination. The default
+keybind can be disabled by setting `g:neural.set_default_keybinds` to any falsy
+value.
+
 ## 📜 Acknowledgements
 
 Neural was created by [Anexon](https://github.com/Angelchev), and is maintained

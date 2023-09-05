@@ -7,11 +7,15 @@ let s:neural_script_dir = expand('<sfile>:p:h:h') . '/neural_sources'
 let s:current_job = get(s:, 'current_job', 0)
 " Keep track of the line the last request happened on.
 let s:request_line = get(s:, 'request_line', 0)
+let s:initial_timer = get(s:, 'initial_timer', -1)
+let s:busy_timer = get(s:, 'busy_timer', -1)
 
 " A function purely for tests to be able to reset state
 function! neural#ResetState() abort
     let s:current_job = 0
     let s:request_line = 0
+    let s:initial_timer = -1
+    let s:busy_timer = -1
 endfunction
 
 " Get the Neural scripts directory in a way that makes it hard to modify.
@@ -183,10 +187,23 @@ endfunction
 function! neural#Cleanup() abort
     " Stop any currently running jobs.
     call neural#job#Stop(s:current_job)
+    " Stop timers for informing the user.
+    call timer_stop(s:initial_timer)
+    call timer_stop(s:busy_timer)
 
     " Remove any current signs.
     if has('nvim')
         execute 'lua require(''neural'').stop_animated_sign(' . s:request_line . ')'
+    endif
+endfunction
+
+function! neural#Stop() abort
+    let l:was_running = neural#job#IsRunning(s:current_job)
+    call neural#Cleanup()
+
+    if l:was_running && g:neural.ui.echo_enabled
+        " no-custom-checks
+        echomsg 'Neural stopped.'
     endif
 endfunction
 
@@ -293,10 +310,10 @@ function! neural#Prompt(prompt) abort
     " Tell the user something is happening, if enabled.
     if g:neural.ui.echo_enabled
         " Echo with a 0 millisecond timer to avoid 'Press Enter to Continue'
-        call timer_start(0, {-> s:InitiallyInformUser(l:job_id)})
+        let s:initial_timer = timer_start(0, {-> s:InitiallyInformUser(l:job_id)})
 
         " If returning an answer takes a while, tell them again.
-        call timer_start(5000, {-> s:InformUserIfStillBusy(l:job_id)})
+        let s:busy_timer = timer_start(5000, {-> s:InformUserIfStillBusy(l:job_id)})
     endif
 
     if has('nvim')

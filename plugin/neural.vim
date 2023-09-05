@@ -30,6 +30,17 @@ if !s:has_features
 endif
 
 command! -nargs=? Neural :call neural#Prompt(<q-args>)
+command! -nargs=0 NeuralStop :call neural#Stop()
 
 " <Plug> mappings for commands
-nnoremap <Plug>(neural_prompt) :call neural#OpenPrompt()<Return>
+nnoremap <silent> <Plug>(neural_prompt) :call neural#OpenPrompt()<Return>
+nnoremap <silent> <Plug>(neural_stop) :call neural#Stop()<Return>
+
+" Set default keybinds for Neural unless we're told not to. We should almost
+" never define keybinds by default in a plugin, but we can add only a few to
+" make things convenient for users.
+if has_key(g:, 'neural') && get(g:neural, 'set_default_keybinds')
+    if empty(maparg("\<C-c>", 'n'))
+        nnoremap <C-c> <Plug>(neural_stop)
+    endif
+endif

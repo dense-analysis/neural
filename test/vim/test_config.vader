@@ -13,6 +13,11 @@ Execute(The default selection should be correct):
 
   AssertEqual 'openai', get(g:neural, 'selected')
 
+Execute(The default keybind setting should be correct):
+  call neural#config#Load()
+
+  AssertEqual v:true, get(g:neural, 'set_default_keybinds')
+
 Execute(The default prompt settings should be correct):
   call neural#config#Load()
   call filter(g:neural.ui, {key -> key =~ 'prompt'})

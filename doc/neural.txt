@@ -53,6 +53,18 @@ Neural                                                                 *Neural*
   completes writing text to a buffer.
 
 
+NeuralStop                                                         *NeuralStop*
+
+  Stop any currently running Neural tasks, and immediately stop printing text
+  to a Vim buffer at the first available opportunity.
+
+  A plug mapping `<Plug>(neural_stop)` is defined for this command.
+
+  Neural will by default bind <C-c> (CTRL-C) to stopping neural if no mapping
+  is already defined for that key. This behavior can be disabled by setting
+  |g:neural.set_default_keybinds| to any falsy value.
+
+
 ===============================================================================
 4. Options                                                     *neural-options*
                                                                      *g:neural*
@@ -100,6 +112,17 @@ g:neural.selected                                           *g:neural.selected*
   1. `'openai'` - OpenAI
   2. `'chatgpt'` - ChatGPT
 
+
+g:neural.set_default_keybinds                   *g:neural.set_default_keybinds*
+                                            *vim.g.neural.set_default_keybinds*
+  Type: |Boolean|
+  Default: `v:true`
+
+  Sets default keybinds for Neural, assuming the keys are not already bound
+  to something else. The default keybinds are as follows: >
+
+  nnoremap <C-c> <Plug>(neural_stop)
+<
 
 g:neural.pre_process.enabled                     *g:neural.pre_process.enabled*
                                              *vim.g.neural.pre_process.enabled*

@@ -32,6 +32,7 @@ Before:
 
   function! neural#job#Stop(job_id) abort
     call add(g:calls, ['neural#job#Stop', a:job_id])
+    let g:job_id = 0
   endfunction
 
   redir => g:captured_output
@@ -161,3 +162,29 @@ Execute(It should be possible to disable echo messages):
   redir END
 
   AssertEqual '', g:captured_output
+
+Execute(It should be possible to stop Neural):
+  Neural this is a test
+  sleep 1ms
+  call neural#Stop()
+
+  AssertEqual
+  \ [
+  \   'neural#job#Stop',
+  \   'neural#job#Start',
+  \   'neural#job#SendRaw',
+  \   'neural#job#Stop',
+  \ ],
+  \ map(copy(g:calls), 'v:val[0]')
+
+  redir END
+  AssertEqual
+  \ join(
+  \   [
+  \     '',
+  \     'Neural is working...',
+  \     'Neural stopped.',
+  \   ],
+  \   "\n"
+  \ ),
+  \ g:captured_output

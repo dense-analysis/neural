@@ -1,0 +1,12 @@
+Before:
+  let g:input = {'prompt': 'Do something.'}
+  call neural#config#Load()
+
+After:
+  unlet! g:input
+
+Given cpp(An empty C++ file):
+Execute(Basic C++ prompt editing should be done):
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write C++ syntax. Do something.', g:input.prompt

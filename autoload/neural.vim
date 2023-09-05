@@ -206,6 +206,36 @@ function! neural#PreProcess(buffer, input) abort
     endfor
 endfunction
 
+function! s:LoadDataSource() abort
+    let l:selected = g:neural.selected
+
+    try
+        let l:source = function('neural#source#' . selected . '#Get')()
+    catch /E117/
+        call s:OutputErrorMessage('Invalid source: ' . l:selected)
+
+        return
+    endtry
+
+    return l:source
+endfunction
+
+function! s:GetSourceInput(buffer, source, prompt) abort
+    let l:config = get(g:neural.source, a:source.name, {})
+
+    " If the config is not a Dictionary, throw it away.
+    if type(l:config) isnot v:t_dict
+        let l:config = {}
+    endif
+
+    let l:input = {'config': l:config, 'prompt': a:prompt}
+
+    " Pre-process input, such as modifying a prompt.
+    call neural#PreProcess(a:buffer, l:input)
+
+    return l:input
+endfunction
+
 function! neural#Prompt(prompt) abort
     " Reload the Neural config on a prompt request if needed.
     call neural#config#Load()
@@ -221,25 +251,6 @@ function! neural#Prompt(prompt) abort
         return
     endif
 
-    let l:selected = g:neural.selected
-    let l:GetDatasource = function('neural#source#' . selected . '#Get')
-
-    try
-        let l:source = l:GetDatasource()
-    catch /E117/
-        call s:OutputErrorMessage('Invalid source: ' . l:selected)
-
-        return
-    endtry
-
-    let l:config = get(g:neural.source, l:source.name, {})
-
-    " If the config is not a Dictionary, throw it away.
-    if type(l:config) isnot v:t_dict
-        let l:config = {}
-    endif
-
-    let l:input = {'config': l:config, 'prompt': a:prompt}
     let l:buffer = bufnr('')
     let l:moving_line = getpos('.')[1]
     let s:request_line = l:moving_line
@@ -248,8 +259,7 @@ function! neural#Prompt(prompt) abort
         let l:moving_line -= 1
     endif
 
-    call neural#PreProcess(l:buffer, l:input)
-
+    let l:source = s:LoadDataSource()
     let l:script_exe = s:GetScriptExecutable(l:source)
     let l:command = neural#Escape(l:script_exe)
     \   . ' ' . neural#Escape(l:source.script)
@@ -259,6 +269,7 @@ function! neural#Prompt(prompt) abort
     \   'error_lines': [],
     \   'content_started': 0,
     \}
+    let l:input = s:GetSourceInput(l:buffer, l:source, a:prompt)
 
     let l:job_id = neural#job#Start(l:command, {
     \   'mode': 'nl',

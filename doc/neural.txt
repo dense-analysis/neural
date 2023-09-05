@@ -6,10 +6,10 @@ CONTENTS                                                      *neural-contents*
 
   1. Introduction.........................|neural-introduction|
   2. Supported Tools......................|neural-support|
-  3. Options..............................|neural-options|
-    3.1 OpenAI............................|neural-openai|
-    3.2 ChatGPT...........................|neural-chatgpt|
-  4. Commands/Keybinds....................|neural-commands|
+  3. Commands/Keybinds....................|neural-commands|
+  4. Options..............................|neural-options|
+    4.1 OpenAI............................|neural-openai|
+    4.2 ChatGPT...........................|neural-chatgpt|
   5. API..................................|neural-api|
   6. Environment Variables................|neural-env|
     6.1 Linux + KDE.......................|neural-env-kde|
@@ -35,7 +35,26 @@ To select the tool that Neural will use, set |g:neural.selected| to the
 appropriate value. OpenAI is the default data source.
 
 ===============================================================================
-3. Options                                                     *neural-options*
+3. Commands/Keybinds                                          *neural-commands*
+
+
+Neural                                                                 *Neural*
+
+  Prompt Neural for a response. e.g. `:Neural say hello`
+
+  If the command is run with no text input and `nui.vim` is installed, a fancy
+  UI for entering the prompt will be shown.
+
+  See https://github.com/MunifTanjim/nui.nvim for installation instructions.
+
+  A plug mapping `<Plug>(neural_prompt)` is defined for this command.
+
+  A |NeuralWritePost| event will be fired whenever Neural successfully
+  completes writing text to a buffer.
+
+
+===============================================================================
+4. Options                                                     *neural-options*
                                                                      *g:neural*
 
 All of Neural's options are controlled with a single dictionary that can be
@@ -136,7 +155,7 @@ g:neural.ui.animated_sign_enabled           *g:neural.ui.animated_sign_enabled*
 
 
 -------------------------------------------------------------------------------
-3.1 OpenAI                                                      *neural-openai*
+4.1 OpenAI                                                      *neural-openai*
 
 Options for configuring OpenAI are listed below.
 
@@ -215,7 +234,7 @@ g:neural.source.openai.top_p                     *g:neural.source.openai.top_p*
 
 
 -------------------------------------------------------------------------------
-3.2 ChatGPT                                                    *neural-chatgpt*
+4.2 ChatGPT                                                    *neural-chatgpt*
 
 Options for configuring ChatGPT are listed below.
 
@@ -271,24 +290,6 @@ g:neural.source.chatgpt.top_p                   *g:neural.source.chatgpt.top_p*
 
   See Also: |g:neural.source.openai.top_p|
 
-
-===============================================================================
-4. Commands/Keybinds                                          *neural-commands*
-
-
-Neural                                                                 *Neural*
-
-  Prompt Neural for a response. e.g. `:Neural say hello`
-
-  If the command is run with no text input and `nui.vim` is installed, a fancy
-  UI for entering the prompt will be shown.
-
-  See https://github.com/MunifTanjim/nui.nvim for installation instructions.
-
-  A plug mapping `<Plug>(neural_prompt)` is defined for this command.
-
-  A |NeuralWritePost| event will be fired whenever Neural successfully
-  completes writing text to a buffer.
 
 
 ===============================================================================

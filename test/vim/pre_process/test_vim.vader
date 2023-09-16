@@ -1,0 +1,12 @@
+Before:
+  let g:input = {'prompt': 'Do something.'}
+  call neural#config#Load()
+
+After:
+  unlet! g:input
+
+Given vim(An empty Vim file):
+Execute(Basic Vim prompt editing should be done):
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write Vim script syntax. Do something.', g:input.prompt

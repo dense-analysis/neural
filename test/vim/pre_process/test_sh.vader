@@ -1,0 +1,36 @@
+Before:
+  Save b:current_syntax
+
+  let g:input = {'prompt': 'Do something.'}
+  call neural#config#Load()
+
+After:
+  Restore
+
+  unlet! g:input
+  unlet! b:is_bash
+  unlet! b:is_kornshell
+
+Given sh(An empty shell Script):
+Execute(sh filetypes should ask for shell script syntax by default):
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write shell script syntax. Do something.', g:input.prompt
+
+Execute(sh filetypes should ask for Bash script syntax for Bash files):
+  let b:is_bash = 1
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write Bash syntax. Do something.', g:input.prompt
+
+Execute(sh filetypes should ask for zsh script syntax for zsh files):
+  let b:current_syntax = 'zsh'
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write zsh syntax. Do something.', g:input.prompt
+
+Execute(sh filetypes should ask for ksh script syntax for ksh files):
+  let b:is_kornshell = 1
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write Kornshell syntax. Do something.', g:input.prompt

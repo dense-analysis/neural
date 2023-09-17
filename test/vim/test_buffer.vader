@@ -1,64 +1,88 @@
 Before:
   Save g:neural
 
-  runtime autoload/neural/job.vim
+  runtime autoload/neural.vim
 
   unlet! g:neural
-  let g:job_id = 0
+  " let g:neural = {'buffer': {'run_key': '\<C-CR>'}}
+
   let g:calls = []
-  let g:OutCb = {->0}
-  let g:ErrCb = {->0}
-  let g:ExitCb = {->0}
-  let g:captured_output = ''
 
-  function! neural#job#Start(command, options) abort
-    let g:job_id += 1
-    call add(g:calls, ['neural#job#Start'])
-
-    let g:OutCb = a:options.out_cb
-    let g:ErrCb = a:options.err_cb
-    let g:ExitCb = a:options.exit_cb
-
-    return g:job_id
+  function! neural#Run(prompt, options) abort
+    call add(g:calls, ['neural#Run', a:prompt, a:options])
   endfunction
 
-  function! neural#job#IsRunning(job_id) abort
-    return g:job_id == a:job_id
-  endfunction
-
-  function! neural#job#SendRaw(job_id, string) abort
-    call add(g:calls, ['neural#job#SendRaw', a:job_id, a:string])
-  endfunction
-
-  function! neural#job#Stop(job_id) abort
-    call add(g:calls, ['neural#job#Stop', a:job_id])
-  endfunction
-
-  redir => g:captured_output
-  call neural#ResetState()
+  " Test plug mapping
+  " noremap <C-n> <Plug>(neural_buffer)
 
 After:
-  redir END
-
-  unlet! g:job_id
   unlet! g:calls
-  unlet! g:OutCb
-  unlet! g:ErrCb
-  unlet! g:ExitCb
-
-  augroup WritePostGroup
-    autocmd!
-  augroup END
 
   runtime autoload/neural/job.vim
 
+  Restore
 
-Execute(It should create a new neural buffer correctly and run):
-  call neural#buffer#CreateBuffer()
-  call neural#buffer#RunBuffer()
+Execute(It should create neural scratch buffer with default settings):
+  NeuralBuffer
+
+  AssertEqual bufexists('Neural Buffer'), 1
+  AssertEqual &filetype, 'neuralbuf'
+  "TODO: Assert if created with new or vertical new
+  AssertEqual &l:wrap, 1
+  AssertEqual &l:linebreak, 1
+
+  bdelete! Neural Buffer
+
+Execute(It should create neural scratch buffer with arguments):
+  NeuralBuffer {"name": "Test Name", "create_mode": "horizontal", "wrap": v:false}
+
+  AssertEqual bufexists('Test Name'), 1
+  AssertEqual &filetype, 'neuralbuf'
+  "TODO: Assert if created with new or vertical new
+  AssertEqual &l:wrap, 0
+  AssertEqual &l:linebreak, 0
+
+  bdelete! Test Name
+
+  " Check commands and plugin mappings"
+  " assert setlocal vars that were called/set? as &l:somevar
+
+" Execute(Check custom keybinds defined):
+" define new keybindings
+" check local buffer keybinding"
+
+Given neuralbuf(A Neural buffer):
+  write a story
+Execute(It should correctly run neural):
+  NeuralRun
 
   AssertEqual
   \ [
-  \   ['neural#Run', '', {'line': 1, 'echo': 0}],
+  \   ['neural#Run', 'write a story', {'line': 1, 'echo': 0}],
+  \ ],
+  \ g:calls
+
+Execute (Call the <Plug> mapping):
+  " let g:neural = {'buffer': {'run_key': '\<C-CR>'}}
+  call neural#config#Load()
+  " noremap <leader>t <Plug>(neural_run)
+  " inoremap <Plug>(neural_run) <leader>t<Plug>(neural_run)
+
+  " imap <buffer> <leader>mi <Plug>(myplugin_myinsertfunction)
+  " imap <buffer> <leader>t <Plug>(neural_run)
+  AssertEqual g:neural.buffer.run_key, '\<CR-C>'
+  nnoremap <buffer> <leader>t <Plug>(neural_run)
+  inoremap <buffer> <leader>t <ESC><Plug>(neural_run)
+  " Call in normal mode mapping
+  normal! <leader>t
+  " Enter insert mode
+  startinsert
+  " Call the insert mode mapping
+  normal! <leader>t
+
+  AssertEqual
+  \ [
+  \   ['neural#Run', 'write a story', {'line': 1, 'echo': 0}],
+  \   ['neural#Run', 'write a story', {'line': 1, 'echo': 0}],
   \ ],
   \ g:calls

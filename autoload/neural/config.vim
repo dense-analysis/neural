@@ -18,6 +18,8 @@ let s:defaults = {
 \   },
 \   'buffer': {
 \       'run_key': "\<C-CR>",
+\       'create_mode': 'vertical',
+\       'wrap': v:true,
 \   },
 \   'source': {
 \       'openai': {

@@ -12,7 +12,15 @@ echo '========================================'
 echo 'tox warnings/errors follow:'
 echo
 
-tox_command='tox --workdir .tox-docker --skip-missing-interpreters=false'
+# Use a different tox directory if running outside of docker to avoid issues
+# with the docker mounted directory writing as root, and other differences.
+if [ "$NO_DOCKER" -eq 1 ]; then
+    tox_dir=.tox
+else
+    tox_dir=.tox-docker
+fi
+
+tox_command="tox --workdir $tox_dir --skip-missing-interpreters=false"
 
 set -o pipefail
 

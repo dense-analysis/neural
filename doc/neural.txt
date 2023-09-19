@@ -215,6 +215,15 @@ g:neural.source.openai.max_tokens           *g:neural.source.openai.max_tokens*
   This translates to roughly `¾` of a word (e.g. `100 tokens ~= 75 words`).
 
 
+g:neural.source.openai.model                     *g:neural.source.openai.model*
+                                             *vim.g.neural.source.openai.model*
+  Type: |String|
+  Default: `'text-davinci-003'`
+
+  The model to use for OpenAI. Please consult OpenAI's documentation for more
+  information on models: https://platform.openai.com/docs/models/overview
+
+
 g:neural.source.openai.presence_penalty
                                       *g:neural.source.openai.presence_penalty*
                                   *vim.g.neural.source.openai.presence_penalty*
@@ -287,6 +296,15 @@ g:neural.source.chatgpt.max_tokens         *g:neural.source.chatgpt.max_tokens*
   Default: `2048`
 
   See Also: |g:neural.source.openai.max_tokens|
+
+
+g:neural.source.chatgpt.model                   *g:neural.source.chatgpt.model*
+                                            *vim.g.neural.source.chatgpt.model*
+  Type: |String|
+  Default: `'gpt-3.5-turbo'`
+
+  The model to use for ChatGPT. Please consult OpenAI's documentation for more
+  information on models: https://platform.openai.com/docs/models/overview
 
 
 g:neural.source.chatgpt.presence_penalty

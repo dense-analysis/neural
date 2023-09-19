@@ -20,6 +20,7 @@ class Config:
     def __init__(
         self,
         api_key: str,
+        model: str,
         temperature: float,
         top_p: float,
         max_tokens: int,
@@ -27,6 +28,7 @@ class Config:
         frequency_penalty: float,
     ):
         self.api_key = api_key
+        self.model = model
         self.temperature = temperature
         self.top_p = top_p
         self.max_tokens = max_tokens
@@ -40,7 +42,7 @@ def get_openai_completion(config: Config, prompt: str) -> None:
         "Authorization": f"Bearer {config.api_key}"
     }
     data = {
-        "model": "text-davinci-003",
+        "model": config.model,
         "prompt": prompt,
         "temperature": config.temperature,
         "max_tokens": config.max_tokens,
@@ -88,6 +90,11 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
     if not isinstance(api_key, str) or not api_key:  # type: ignore
         raise ValueError("openai.api_key is not defined")
 
+    model = raw_config.get('model')
+
+    if not isinstance(model, str) or not model:
+        raise ValueError("openai.model is not defined")
+
     temperature = raw_config.get('temperature', 0.2)
 
     if not isinstance(temperature, (int, float)):
@@ -115,6 +122,7 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
 
     return Config(
         api_key=api_key,
+        model=model,
         temperature=temperature,
         top_p=top_p,
         max_tokens=max_tokens,

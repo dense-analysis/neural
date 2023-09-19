@@ -14,6 +14,7 @@ from neural_sources import openai
 def get_valid_config() -> Dict[str, Any]:
     return {
         "api_key": ".",
+        "model": "foo",
         "prompt": "say hello",
         "temperature": 1,
         "top_p": 1,
@@ -34,8 +35,10 @@ def test_load_config_errors():
     for modification, expected_error in [
         ({}, "openai.api_key is not defined"),
         ({"api_key": ""}, "openai.api_key is not defined"),
+        ({"api_key": "."}, "openai.model is not defined"),
+        ({"model": ""}, "openai.model is not defined"),
         (
-            {"api_key": ".", "temperature": "x"},
+            {"model": "x", "temperature": "x"},
             "openai.temperature is invalid"
         ),
         (

@@ -1,6 +1,7 @@
 .coverage
 .directory
 .tox
+.tox-docker
 /env
 __pycache__
 tags

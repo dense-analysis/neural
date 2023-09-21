@@ -1,0 +1,12 @@
+Before:
+  let g:input = {'prompt': 'Do something.'}
+  call neural#config#Load()
+
+After:
+  unlet! g:input
+
+Given python(An empty Python file):
+Execute(Basic Python prompt editing should be done):
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write Python syntax. Do something.', g:input.prompt

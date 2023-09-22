@@ -230,7 +230,7 @@ g:neural.source.openai.max_tokens           *g:neural.source.openai.max_tokens*
 g:neural.source.openai.model                     *g:neural.source.openai.model*
                                              *vim.g.neural.source.openai.model*
   Type: |String|
-  Default: `'text-davinci-003'`
+  Default: `'gpt-3.5-turbo-instruct'`
 
   The model to use for OpenAI. Please consult OpenAI's documentation for more
   information on models: https://platform.openai.com/docs/models/overview

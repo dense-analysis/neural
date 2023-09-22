@@ -53,6 +53,18 @@ Neural                                                                 *Neural*
   completes writing text to a buffer.
 
 
+NeuralExplain                                                   *NeuralExplain*
+
+  A |visual-mode| command for explaining the highlighted lines. The visual
+  selection will be sent to the currently selected source model and the
+  response will be displayed in a preview window.
+
+  Neural will make basic attempts to redact lines that appear to contain
+  passwords or secrets.
+
+  A plug mapping `<Plug>(neural_explain)` is defined for this command.
+
+
 NeuralStop                                                         *NeuralStop*
 
   Stop any currently running Neural tasks, and immediately stop printing text

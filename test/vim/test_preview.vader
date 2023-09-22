@@ -1,0 +1,24 @@
+After:
+  unlet! g:preview_data
+
+Execute(Preview windows should be opened correctly):
+  call neural#preview#Show(['a', 'b'], {'stay_here': 1})
+  wincmd p
+  let g:preview_data = {
+  \ 'lines': getline(1, '$'),
+  \ 'filetype': &filetype,
+  \ 'modifiable': &modifiable,
+  \ 'readonly': &readonly,
+  \}
+  :q
+
+  " Assert values only after closing the preview window.
+  " Otherwise the window will remain open.
+  AssertEqual
+  \ {
+  \   'lines': ['a', 'b'],
+  \   'filetype': 'neural-preview',
+  \   'modifiable': 0,
+  \   'readonly': 1,
+  \ },
+  \ g:preview_data

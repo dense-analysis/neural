@@ -41,7 +41,7 @@ function Neural.prompt()
 end
 
 function Neural.start_animated_sign(line)
-    local sign_enabled = vim.g.neural.ui.animated_sign_enabled
+    local sign_enabled = vim.g.neural and vim.g.neural.ui.animated_sign_enabled
 
     if has_significant and (sign_enabled and sign_enabled ~= 0) and line > 0 then
         AnimatedSign.start_animated_sign(line, 'dots', 100)
@@ -49,7 +49,7 @@ function Neural.start_animated_sign(line)
 end
 
 function Neural.stop_animated_sign(line)
-    local sign_enabled = vim.g.neural.ui.animated_sign_enabled
+    local sign_enabled = vim.g.neural and vim.g.neural.ui.animated_sign_enabled
 
     if has_significant and (sign_enabled and sign_enabled ~= 0) and line > 0 then
         AnimatedSign.stop_animated_sign(line, {unplace_sign=true})

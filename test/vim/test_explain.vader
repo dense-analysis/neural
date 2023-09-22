@@ -1,0 +1,113 @@
+Before:
+  Save g:neural
+
+  " Load modules so we can mock the fuctions.
+  runtime autoload/neural/job.vim
+  runtime autoload/neural/visual.vim
+  runtime autoload/neural/preview.vim
+
+  unlet! g:neural
+  let g:job_id = 0
+  let g:calls = []
+  let g:preview_calls = []
+  let g:OutCb = {->0}
+  let g:ErrCb = {->0}
+  let g:ExitCb = {->0}
+
+  function! neural#job#Start(command, options) abort
+    let g:job_id += 1
+    call add(g:calls, ['neural#job#Start'])
+
+    let g:OutCb = a:options.out_cb
+    let g:ErrCb = a:options.err_cb
+    let g:ExitCb = a:options.exit_cb
+
+    return g:job_id
+  endfunction
+
+  function! neural#job#IsRunning(job_id) abort
+    return g:job_id == a:job_id
+  endfunction
+
+  function! neural#job#SendRaw(job_id, string) abort
+    call add(g:calls, ['neural#job#SendRaw', a:job_id, a:string])
+  endfunction
+
+  function! neural#job#Stop(job_id) abort
+    call add(g:calls, ['neural#job#Stop', a:job_id])
+    let g:job_id = 0
+  endfunction
+
+  function! neural#visual#GetRange() abort
+    return g:get_range_result
+  endfunction
+
+  function! neural#preview#Show(lines, options) abort
+    call add(g:preview_calls, [a:lines, a:options])
+  endfunction
+
+After:
+  Restore
+
+  unlet! g:job_id
+  unlet! g:calls
+  unlet! g:preview_calls
+  unlet! g:OutCb
+  unlet! g:ErrCb
+  unlet! g:ExitCb
+  unlet! g:get_range_result
+
+  " Load actual code again.
+  runtime autoload/neural/job.vim
+  runtime autoload/neural/visual.vim
+  runtime autoload/neural/preview.vim
+
+Given text(Some lines):
+  One
+  Two
+  Three
+  Four
+  Five
+  Six
+Execute():
+  " Set up a mocked result for the range selection.
+  let g:get_range_result = {
+  \ 'lnum': 2,
+  \ 'col': 2,
+  \ 'end_lnum': 4,
+  \ 'end_col': 3,
+  \ 'selection': ['ne', 'Two', 'Three', 'Fou'],
+  \}
+
+  " Run the function :NeuralExplain runs.
+  call neural#explain#SelectedLines()
+  call timer_stopall()
+
+  " We should send the visually selected lines to the job.
+  AssertEqual
+  \ [
+  \   ['neural#job#Start'],
+  \   [
+  \     'neural#job#SendRaw',
+  \     1,
+  \     json_encode({
+  \       'config': g:neural.source[g:neural.selected],
+  \       'prompt': "Explain these lines:\n\nne\nTwo\nThree\nFou",
+  \     }) . "\n",
+  \   ]
+  \ ],
+  \ g:calls
+
+  call g:OutCb(g:job_id, 'first output line')
+  call g:OutCb(g:job_id, 'second output line')
+  call g:ExitCb(g:job_id, 0)
+
+  " We should make a call to preview the lines.
+  AssertEqual
+  \ [
+  \   [
+  \     ['first output line', 'second output line'],
+  \     {'stay_here': 1}
+  \   ],
+  \ ],
+  \ g:preview_calls

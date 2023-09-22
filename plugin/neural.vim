@@ -29,12 +29,17 @@ if !s:has_features
     finish
 endif
 
+" Have Neural write to the buffer given a prompt.
 command! -nargs=? Neural :call neural#Prompt(<q-args>)
+" Stop Neural doing anything.
 command! -nargs=0 NeuralStop :call neural#Stop()
+" Have Neural explain the visually selected lines.
+command! -range NeuralExplain :call neural#explain#SelectedLines()
 
 " <Plug> mappings for commands
 nnoremap <silent> <Plug>(neural_prompt) :call neural#OpenPrompt()<Return>
 nnoremap <silent> <Plug>(neural_stop) :call neural#Stop()<Return>
+vnoremap <silent> <Plug>(neural_explain) :NeuralExplain<Return>
 
 " Set default keybinds for Neural unless we're told not to. We should almost
 " never define keybinds by default in a plugin, but we can add only a few to

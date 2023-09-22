@@ -1,0 +1,32 @@
+Execute(Object values for password and secret keys should be redacted):
+  AssertEqual
+  \ [
+  \   '{',
+  \   '  "password": "*", "SecretKey": r"*",',
+  \   '  ''password'': ''*'', ''Secret_Key'': r''*'',',
+  \   '  "password": ''*'', "secret key": r''*'',',
+  \   '  ''password'': "*", ''secretkey'' :  r"*",',
+  \   '}',
+  \ ],
+  \ neural#redact#PasswordsAndSecrets([
+  \   '{',
+  \   '  "password": "hideme", "SecretKey": r"hideme",',
+  \   '  ''password'': ''hideme'', ''Secret_Key'': r''hideme'',',
+  \   '  "password": ''hideme'', "secret key": r''hideme'',',
+  \   '  ''password'': "hideme", ''secretkey'' :  r"hideme",',
+  \   '}',
+  \ ])
+
+Execute(Assignment expressions should be redacted):
+  AssertEqual
+  \ ['password = ''*'''],
+  \ neural#redact#PasswordsAndSecrets(['password = ''hideme'''])
+  AssertEqual
+  \ ['password = "*"'],
+  \ neural#redact#PasswordsAndSecrets(['password = "hideme"'])
+  AssertEqual
+  \ ['password = `*`'],
+  \ neural#redact#PasswordsAndSecrets(['password = `hideme`'])
+  AssertEqual
+  \ ['password := `*`'],
+  \ neural#redact#PasswordsAndSecrets(['password := `hideme`'])

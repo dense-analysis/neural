@@ -131,6 +131,30 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
     )
 
 
+def get_error_message(error: urllib.error.HTTPError) -> str:
+    message = error.read().decode('utf-8', errors='ignore')
+
+    try:
+        # JSON data might look like this:
+        # {
+        #   "error": {
+        #       "message": "...",
+        #       "type": "...",
+        #       "param": null,
+        #       "code": null
+        #   }
+        # }
+        message = json.loads(message)['error']['message']
+
+        if "This model's maximum context length is" in message:
+            message = 'Too much text for a request!'
+    except Exception:
+        # If we can't get a better message use the JSON payload at least.
+        pass
+
+    return message
+
+
 def main() -> None:
     input_data = json.loads(sys.stdin.readline())
 
@@ -141,8 +165,11 @@ def main() -> None:
 
     try:
         get_openai_completion(config, input_data["prompt"])
-    except urllib.error.URLError as error:
-        if isinstance(error, urllib.error.HTTPError) and error.code == 429:
+    except urllib.error.HTTPError as error:
+        if error.code == 400:
+            message = get_error_message(error)
+            sys.exit('Neural error: OpenAI request failure: ' + message)
+        elif error.code == 429:
             sys.exit("Neural error: OpenAI request limit reached!")
         else:
             raise

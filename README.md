@@ -8,6 +8,8 @@ A ChatGPT Vim plugin, an OpenAI Neovim plugin, and so much more! Neural integrat
 
 * Generate text easily `:Neural write a story`
 * Support for multiple machine learning models
+* Focused on privacy and avoiding leaking data to third parties
+* Easily ask AI to explain code or paragraphs `:NeuralExplain`
 * Compatible with Vim 8.0+ & Neovim 0.8+
 * Supported on Linux, Mac OSX, and Windows
 * Only dependency is Python 3.7+
@@ -107,11 +109,25 @@ Try typing `:Neural say hello`, and if all goes well the machine learning
 tool will say "hello" to you in the current buffer. Type `:help neural` to
 see the full documentation.
 
+## 🛠️ Commands
+
+### `:NeuralExplain`
+
+You can ask Neural to explain code or text by visually selecting it and running
+the `:NeuralExplain` command. You may also create a custom keybind for
+explaining a visual range with `<Plug>(neural_explain)`.
+
+Neural will make basic attempts to redact lines that appear to contain passwords
+or secrets. You may audit this code by reading
+[`autoload/neural/redact.vim`](https://github.com/dense-analysis/neural/blob/main/autoload/neural/redact.vim)
+
+### `:NeuralStop`
+
 You can stop Neural from working by with the `NeuralStop` command. Unless
 another keybind for `<C-c>` (CTRL+C) is defined in normal mode, Neural will run
 the stop command by default when you enter that key combination. The default
 keybind can be disabled by setting `g:neural.set_default_keybinds` to any falsy
-value.
+value. You can set a keybind to stop Neural by mapping to `<Plug>(neural_stop)`.
 
 ## 📜 Acknowledgements
 

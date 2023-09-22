@@ -1,6 +1,7 @@
 Before:
   Save g:neural
 
+  " Load modules so we can mock the fuctions.
   runtime autoload/neural/job.vim
 
   unlet! g:neural
@@ -39,6 +40,8 @@ Before:
   call neural#ResetState()
 
 After:
+  Restore
+
   redir END
 
   unlet! g:job_id
@@ -46,14 +49,14 @@ After:
   unlet! g:OutCb
   unlet! g:ErrCb
   unlet! g:ExitCb
+  unlet! g:captured_output
 
   augroup WritePostGroup
     autocmd!
   augroup END
 
+  " Load actual code again.
   runtime autoload/neural/job.vim
-
-  Restore
 
 Given text (A file with two lines and a blank line in the middle):
   First line
@@ -71,8 +74,8 @@ Execute(Running Neural and collecting output should work):
     autocmd User NeuralWritePost :call add(g:calls, ['NeuralWritePost'])
   augroup END
 
-  call g:OutCb(g:job_id, "first output line")
-  call g:OutCb(g:job_id, "second output line")
+  call g:OutCb(g:job_id, 'first output line')
+  call g:OutCb(g:job_id, 'second output line')
   call g:ExitCb(g:job_id, 0)
 
   AssertEqual
@@ -91,18 +94,16 @@ Execute(Running Neural and collecting output should work):
 
   AssertEqual
   \ [
-  \   ['neural#job#Stop', 0],
   \   ['neural#job#Start'],
   \   [
   \     'neural#job#SendRaw',
   \     1,
   \     json_encode({
-  \       'config': g:neural.source.openai,
+  \       'config': g:neural.source[g:neural.selected],
   \       'prompt': 'this is a test',
   \     }) . "\n",
   \   ],
   \   ['NeuralWritePost'],
-  \   ['neural#job#Stop', 1],
   \ ],
   \ g:calls
 
@@ -170,7 +171,6 @@ Execute(It should be possible to stop Neural):
 
   AssertEqual
   \ [
-  \   'neural#job#Stop',
   \   'neural#job#Start',
   \   'neural#job#SendRaw',
   \   'neural#job#Stop',

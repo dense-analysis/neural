@@ -1,0 +1,12 @@
+Before:
+  let g:input = {'prompt': 'Do something.'}
+  call neural#config#Load()
+
+After:
+  unlet! g:input
+
+Given css(An empty CSS file):
+Execute(Basic CSS prompt editing should be done):
+  call neural#PreProcess(bufnr(''), g:input)
+
+  AssertEqual 'Write CSS code. Do something.', g:input.prompt

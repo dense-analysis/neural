@@ -2,6 +2,8 @@
 A Neural datasource for loading generated text via OpenAI.
 """
 import json
+import platform
+import ssl
 import sys
 import urllib.error
 import urllib.request
@@ -51,14 +53,27 @@ def get_openai_completion(config: Config, prompt: str) -> None:
         "frequency_penalty": config.frequency_penalty,
         "stream": True,
     }
+
     req = urllib.request.Request(
         API_ENDPOINT,
         data=json.dumps(data).encode("utf-8"),
         headers=headers,
         method="POST",
+        unverifiable=True,
     )
 
-    with urllib.request.urlopen(req) as response:
+    # Disable SSL certificate verification on macOS.
+    # This is bad for security, and we need to deal with SSL errors better.
+    #
+    # This is the error:
+    # urllib.error.URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:997)>  # noqa
+    context = (
+        ssl._create_unverified_context()  # type: ignore
+        if platform.system() == "Darwin" else
+        None
+    )
+
+    with urllib.request.urlopen(req, context=context) as response:
         while True:
             line_bytes = response.readline()
 

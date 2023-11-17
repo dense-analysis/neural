@@ -2,6 +2,8 @@
 A Neural datasource for ChatGPT conversations.
 """
 import json
+import platform
+import ssl
 import sys
 import urllib.error
 import urllib.request
@@ -67,7 +69,18 @@ def get_chatgpt_completion(
     )
     role: Optional[str] = None
 
-    with urllib.request.urlopen(req) as response:
+    # Disable SSL certificate verification on macOS.
+    # This is bad for security, and we need to deal with SSL errors better.
+    #
+    # This is the error:
+    # urllib.error.URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:997)>  # noqa
+    context = (
+        ssl._create_unverified_context()  # type: ignore
+        if platform.system() == "Darwin" else
+        None
+    )
+
+    with urllib.request.urlopen(req, context=context) as response:
         while True:
             line_bytes = response.readline()
 

@@ -4,16 +4,18 @@
 ===============================================================================
 CONTENTS                                                      *neural-contents*
 
-  1. Introduction.........................|neural-introduction|
-  2. Supported Tools......................|neural-support|
-  3. Commands/Keybinds....................|neural-commands|
-  4. Options..............................|neural-options|
-    4.1 OpenAI............................|neural-openai|
-    4.2 ChatGPT...........................|neural-chatgpt|
-  5. API..................................|neural-api|
-  6. Environment Variables................|neural-env|
-    6.1 Linux + KDE.......................|neural-env-kde|
-  7. Contact..............................|neural-contact|
+  1. Introduction ............................... |neural-introduction|
+  2. Supported Tools ............................ |neural-support|
+  3. Commands/Keybinds .......................... |neural-commands|
+  4. Options .................................... |neural-options|
+    4.1 UI ........................................ |neural-ui|
+    4.2 Neural Buffer ............................. |neural-buffer|
+    4.3 OpenAI .................................... |neural-openai|
+    4.4 ChatGPT ................................... |neural-chatgpt|
+  5. API ........................................ |neural-api|
+  6. Environment Variables ...................... |neural-env|
+    6.1 Linux + KDE ............................. |neural-env-kde|
+  7. Contact .................................... |neural-contact|
 
 ===============================================================================
 1. Introduction                                           *neural-introduction*
@@ -53,6 +55,28 @@ Neural                                                                 *Neural*
   completes writing text to a buffer.
 
 
+NeuralBuffer                                                     *NeuralBuffer*
+
+  Create a buffer with a `neuralbuf` filetype for interacting with neural
+  sources directly. This can be a useful scratch buffer and playground for code
+  generation and completion.
+
+  - See |neural-buffer| for configuration options.
+  - See |NeuralCompletion| for running neural completions in the buffer.
+
+  A plug mapping `<Plug>(neural_buffer)` is defined for this.
+
+
+NeuralCompletion                                             *NeuralCompletion*
+
+  A command for a |NeuralBuffer| (`neuralbuf` filetype) that sends all buffer
+  contents to the current neural source for completion and appends the
+  response to the buffer.
+
+  A `neuralbuf` plug mapping `<Plug>(neural_completion)` is defined for this
+  with the default: `<C-CR>`
+
+
 NeuralExplain                                                   *NeuralExplain*
 
   A |visual-mode| command for explaining the highlighted lines. The visual
@@ -62,7 +86,7 @@ NeuralExplain                                                   *NeuralExplain*
   Neural will make basic attempts to redact lines that appear to contain
   passwords or secrets.
 
-  A plug mapping `<Plug>(neural_explain)` is defined for this command.
+  A plug mapping `<Plug>(neural_explain)` is defined for this.
 
 
 NeuralStop                                                         *NeuralStop*
@@ -70,7 +94,7 @@ NeuralStop                                                         *NeuralStop*
   Stop any currently running Neural tasks, and immediately stop printing text
   to a Vim buffer at the first available opportunity.
 
-  A plug mapping `<Plug>(neural_stop)` is defined for this command.
+  A plug mapping `<Plug>(neural_stop)` is defined for this.
 
   Neural will by default bind <C-c> (CTRL-C) to stopping neural if no mapping
   is already defined for that key. This behavior can be disabled by setting
@@ -147,6 +171,11 @@ g:neural.pre_process.enabled                     *g:neural.pre_process.enabled*
   quality of prompts to produce better results for each filetype.
 
 
+-------------------------------------------------------------------------------
+4.1 UI                                                              *neural-ui*
+
+Options for configuring various UI configurations are listed below.
+
 g:neural.ui.echo_enabled                             *g:neural.ui.echo_enabled*
                                                  *vim.g.neural.ui.echo_enabled*
   Type: |Boolean|
@@ -190,7 +219,39 @@ g:neural.ui.animated_sign_enabled           *g:neural.ui.animated_sign_enabled*
 
 
 -------------------------------------------------------------------------------
-4.1 OpenAI                                                      *neural-openai*
+4.2 Neural Buffer                                               *neural-buffer*
+
+Options for configuring the |NeuralBuffer| are listed below.
+
+
+g:neural.buffer.completion_key                 *g:neural.buffer.completion_key*
+                                           *vim.g.neural.buffer.completion_key*
+  Type: |String|
+  Default: `'<C-CR>'`
+
+  The default key mapping for creating a Neural Buffer.
+
+
+
+g:neural.buffer.create_mode                       *g:neural.buffer.create_mode*
+                                              *vim.g.neural.buffer.create_mode*
+  Type: |String|
+  Default: `'vertical'`
+
+  Options between `'vertical'` or `'horizontal'`.
+  The split mode when creating a new Neural Buffer.
+
+
+g:neural.buffer.wrap                                     *g:neural.buffer.wrap*
+                                                     *vim.g.neural.buffer.wrap*
+  Type: |Boolean|
+  Default: `v:true`
+
+  Option to wrap the contents of the Neural Buffer.
+
+
+-------------------------------------------------------------------------------
+4.3 OpenAI                                                      *neural-openai*
 
 Options for configuring OpenAI are listed below.
 
@@ -278,7 +339,7 @@ g:neural.source.openai.top_p                     *g:neural.source.openai.top_p*
 
 
 -------------------------------------------------------------------------------
-4.2 ChatGPT                                                    *neural-chatgpt*
+4.4 ChatGPT                                                    *neural-chatgpt*
 
 Options for configuring ChatGPT are listed below.
 
@@ -342,7 +403,6 @@ g:neural.source.chatgpt.top_p                   *g:neural.source.chatgpt.top_p*
   Default: `1`
 
   See Also: |g:neural.source.openai.top_p|
-
 
 
 ===============================================================================

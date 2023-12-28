@@ -18,7 +18,7 @@ let s:defaults = {
 \       'echo_enabled': v:true,
 \   },
 \   'buffer': {
-\       'completion_key': '\<C-CR>',
+\       'completion_key': '<C-CR>',
 \       'create_mode': 'vertical',
 \       'wrap': v:true,
 \   },

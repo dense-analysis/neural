@@ -5,14 +5,8 @@ call neural#config#Load()
 
 command! -buffer -nargs=0 NeuralRun :call neural#buffer#RunBuffer()
 
-nnoremap <buffer> <Plug>(neural_completion) :NeuralRun<Return>
+nnoremap <silent> <buffer> <Plug>(neural_completion) :NeuralRun<CR>
 
 " Keybindings of Neural Buffer
-if exists('*keytrans') && exists('g:neural.buffer.completion_key')
-    execute 'nnoremap ' . keytrans(g:neural.buffer.completion_key) . ' <Plug>(neural_completion)'
-    execute 'inoremap ' . keytrans(g:neural.buffer.completion_key) . ' <Esc><Plug>(neural_completion)'
-else
-    nnoremap <C-CR> <Plug>(neural_completion)
-    inoremap <C-CR> <Esc><Plug>(neural_completion)
-endif
-
+execute 'nnoremap ' . g:neural.buffer.completion_key . ' <Plug>(neural_completion)'
+execute 'inoremap ' . g:neural.buffer.completion_key . ' <Esc><Plug>(neural_completion)'

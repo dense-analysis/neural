@@ -73,7 +73,7 @@ Execute(The default neural buffer settings should be correct):
   " AssertEqual {'echo_enabled': v:true}, g:neural.ui
   AssertEqual
   \ {
-  \   'completion_key': '\<C-CR>',
+  \   'completion_key': '<C-CR>',
   \   'create_mode': 'vertical',
   \   'wrap': v:true,
   \ },

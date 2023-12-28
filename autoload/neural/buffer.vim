@@ -38,8 +38,6 @@ endfunction
 
 function! neural#buffer#CreateBuffer(options) abort
     let l:buffer_options = s:GetOptions(a:options)
-    " echo l:buffer_options.name
-    " echo bufnr(l:buffer_options.name)
 
     " TODO: Add auto incrementing buffer names instead of switching.
     if bufexists(l:buffer_options.name)

@@ -35,8 +35,6 @@ command! -nargs=? Neural :call neural#Prompt(<q-args>)
 command! -nargs=0 NeuralStop :call neural#Stop()
 " Create a completion buffer.
 command! -nargs=? NeuralBuffer :call neural#buffer#CreateBuffer(<q-args>)
-" Run completion on a Neural buffer.
-command! -nargs=0 NeuralBufferRun :call neural#buffer#RunBuffer()
 " Have Neural explain the visually selected lines.
 command! -range NeuralExplain :call neural#explain#SelectedLines()
 

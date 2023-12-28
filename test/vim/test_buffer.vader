@@ -43,7 +43,7 @@ Execute(It should create a neural buffer with arguments):
 Given neuralbuf(A Neural buffer):
   write a story
 Execute(It should correctly run neural):
-  NeuralRun
+  NeuralCompletion
 
   AssertEqual
   \ [
@@ -60,6 +60,6 @@ Execute(The correct neural buffer keybinds should be configured):
 
   AssertEqual
   \ [
-  \   'n  <Plug>(neural_completion) *@:NeuralRun<CR>',
+  \   'n  <Plug>(neural_completion) *@:NeuralCompletion<CR>',
   \ ],
   \ sort(split(g:output, "\n"))

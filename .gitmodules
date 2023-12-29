@@ -1,0 +1,3 @@
+[submodule "python3/deps/tiktoken"]
+	path = python3/deps/tiktoken
+	url = https://github.com/openai/tiktoken.git

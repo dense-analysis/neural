@@ -1,8 +1,11 @@
 -- External dependencies
-local UI = {}
-local AnimatedSign = {}
 local has_nui, _ = pcall(require, 'nui.input')
 local has_significant, _ = pcall(require, 'significant')
+local has_notify, _ = pcall(require, 'notify')
+
+local UI = {}
+local AnimatedSign = {}
+local Notify = {}
 
 if has_nui then
     UI = require('neural.ui')
@@ -10,6 +13,10 @@ end
 
 if has_significant then
     AnimatedSign = require('significant')
+end
+
+if has_notify then
+  Notify = require('notify')
 end
 
 local Neural = {}
@@ -52,6 +59,18 @@ function Neural.stop_animated_sign(line)
     if has_significant and (sign_enabled and sign_enabled ~= 0) and line > 0 then
         AnimatedSign.stop_animated_sign(line, {unplace_sign=true})
     end
+end
+
+function Neural.notify(message, level)
+  if has_notify then
+    local opts = {
+      title = 'Neural - Token Count',
+      icon = vim.g.neural.ui.prompt_icon
+    }
+    Notify(message, level, opts)
+  else
+    vim.fn['neural#preview#Show'](message, {stay_here = 1})
+  end
 end
 
 return Neural

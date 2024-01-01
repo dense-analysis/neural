@@ -37,6 +37,8 @@ command! -nargs=0 NeuralStop :call neural#Stop()
 command! -nargs=? NeuralBuffer :call neural#buffer#CreateBuffer(<q-args>)
 " Have Neural explain the visually selected lines.
 command! -range NeuralExplain :call neural#explain#SelectedLines()
+" Get the token count for the visually selected lines.
+command! -range NeuralCountTokens :call neural#count#SelectedLines()
 
 " <Plug> mappings for commands
 nnoremap <silent> <Plug>(neural_prompt) :call neural#OpenPrompt()<Return>

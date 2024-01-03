@@ -1,5 +1,4 @@
-" Author: Anexon <anexon@protonmail.com>
-" Co-author: w0rp <devw0rp@gmail.com>
+" Author: Anexon <anexon@protonmail.com>, w0rp <devw0rp@gmail.com>
 " Description: Utils and helpers with API normalised between Neovim/Vim 8 and
 " platform independent.
 

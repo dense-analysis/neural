@@ -355,3 +355,5 @@ augroup NeuralCleanupGroup
         autocmd VimSuspend call neural#Cleanup()
     endif
 augroup END
+
+highlight NeuralPromptBorder ctermfg=172 guifg=#ff9d0a

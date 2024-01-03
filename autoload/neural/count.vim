@@ -44,7 +44,7 @@ function! neural#count#SelectedLines() abort
         \}
         call neural#job#SendRaw(l:job_id, json_encode(l:input) . "\n")
     else
-        call neural#OutputErrorMessage('Failed to cound tokens')
+        call neural#OutputErrorMessage('Failed to count tokens')
 
         return
     endif

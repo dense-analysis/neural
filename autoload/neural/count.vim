@@ -5,18 +5,23 @@ let s:current_job = get(s:, 'current_count_job', 0)
 
 function! s:HandleOutputEnd(job_data, exit_code) abort
     if a:exit_code == 0
+        let l:output = a:job_data.output_lines[0]
+
         if has('nvim')
-            execute 'lua require(''neural'').notify("' . a:job_data.output_lines[0] . '", "info")'
+            execute 'lua require(''neural.notify'').info("' . l:output . '")'
         else
-            call neural#preview#Show(
-            \   a:job_data.output_lines[0],
-            \   {'stay_here': 1},
-            \)
+            call neural#preview#Show(l:output, {'stay_here': 1})
         endif
+    " Handle error
     else
-        call neural#OutputErrorMessage(join(a:job_data.error_lines, "\n"))
+        if has('nvim')
+            execute 'lua require(''neural.notify'').error("' . join(a:job_data.output_lines, "\n") . '")'
+        else
+            call neural#OutputErrorMessage(join(a:job_data.error_lines, "\n"))
+        endif
     endif
 
+    " Cleanup
     call neural#job#Stop(s:current_job)
     let s:current_job = 0
 endfunction

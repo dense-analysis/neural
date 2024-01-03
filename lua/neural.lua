@@ -1,22 +1,9 @@
 -- External dependencies
 local has_nui, _ = pcall(require, 'nui.input')
-local has_significant, _ = pcall(require, 'significant')
-local has_notify, _ = pcall(require, 'notify')
-
-local UI = {}
-local AnimatedSign = {}
-local Notify = {}
+local has_significant, AnimatedSign = pcall(require, 'significant')
 
 if has_nui then
     UI = require('neural.ui')
-end
-
-if has_significant then
-    AnimatedSign = require('significant')
-end
-
-if has_notify then
-  Notify = require('notify')
 end
 
 local Neural = {}

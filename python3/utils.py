@@ -17,7 +17,7 @@ if __name__ == "__main__":
     input_data = json.loads(sys.stdin.readline())
 
     # TODO: Read config
-    model = input_data["model"]
+    # model = input_data["model"]
 
     # Count tokens
     count = count_tokens(input_data["text"])

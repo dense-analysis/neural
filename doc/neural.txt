@@ -40,7 +40,7 @@ appropriate value. OpenAI is the default data source.
 3. Commands/Keybinds                                          *neural-commands*
 
 
-Neural                                                                 *Neural*
+`Neural`                                                               *Neural*
 
   Prompt Neural for a response. e.g. `:Neural say hello`
 
@@ -55,7 +55,7 @@ Neural                                                                 *Neural*
   completes writing text to a buffer.
 
 
-NeuralBuffer                                                     *NeuralBuffer*
+`NeuralBuffer`                                                   *NeuralBuffer*
 
   Create a buffer with a `neuralbuf` filetype for interacting with neural
   sources directly. This can be a useful scratch buffer and playground for code
@@ -67,7 +67,7 @@ NeuralBuffer                                                     *NeuralBuffer*
   A plug mapping `<Plug>(neural_buffer)` is defined for this.
 
 
-NeuralCompletion                                             *NeuralCompletion*
+`NeuralCompletion`                                           *NeuralCompletion*
 
   A command for a |NeuralBuffer| (`neuralbuf` filetype) that sends all buffer
   contents to the current neural source for completion and appends the
@@ -77,7 +77,7 @@ NeuralCompletion                                             *NeuralCompletion*
   with the default: `<C-CR>`
 
 
-NeuralExplain                                                   *NeuralExplain*
+`NeuralExplain`                                                 *NeuralExplain*
 
   A |visual-mode| command for explaining the highlighted lines. The visual
   selection will be sent to the currently selected source model and the
@@ -89,7 +89,7 @@ NeuralExplain                                                   *NeuralExplain*
   A plug mapping `<Plug>(neural_explain)` is defined for this.
 
 
-NeuralStop                                                         *NeuralStop*
+`:NeuralStop`                                                      *NeuralStop*
 
   Stop any currently running Neural tasks, and immediately stop printing text
   to a Vim buffer at the first available opportunity.

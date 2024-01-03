@@ -12,6 +12,7 @@ CONTENTS                                                      *neural-contents*
     4.2 Neural Buffer ............................. |neural-buffer|
     4.3 OpenAI .................................... |neural-openai|
     4.4 ChatGPT ................................... |neural-chatgpt|
+    4.5 Highlights ................................ |neural-highlights|
   5. API ........................................ |neural-api|
   6. Environment Variables ...................... |neural-env|
     6.1 Linux + KDE ............................. |neural-env-kde|
@@ -404,6 +405,18 @@ g:neural.source.chatgpt.top_p                   *g:neural.source.chatgpt.top_p*
 
   See Also: |g:neural.source.openai.top_p|
 
+
+-------------------------------------------------------------------------------
+4.5 Highlights                                              *neural-highlights*
+
+The following highlights can be configured to change |neural|'s colors.
+
+
+`NeuralPromptBorder`                                       *NeuralPromptBorder*
+
+  Default: `ctermfg=172 guifg=#ff9d0a`
+
+  Color for the |Neural| prompt border.
 
 ===============================================================================
 5. API                                                             *neural-api*

@@ -7,3 +7,5 @@ __pycache__
 tags
 # pyenv
 .python-version
+# python venv
+venv

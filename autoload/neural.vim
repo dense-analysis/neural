@@ -24,11 +24,6 @@ function! neural#GetScriptDir() abort
     return s:neural_script_dir
 endfunction
 
-" Get the Neural scripts directory in a way that makes it hard to modify.
-function! neural#GetPythonDir() abort
-    return s:neural_python_dir
-endfunction
-
 " Output an error message. The message should be a string.
 " The output error lines will be split in a platform-independent way.
 function! neural#OutputErrorMessage(message) abort

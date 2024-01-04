@@ -3,6 +3,7 @@
 
 " The location of Neural source scripts
 let s:neural_script_dir = expand('<sfile>:p:h:h') . '/neural_sources'
+let s:neural_python_dir = expand('<sfile>:p:h:h') . '/python3'
 " Keep track of the current job.
 let s:current_job = get(s:, 'current_job', 0)
 " Keep track of the line the last request happened on.

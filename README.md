@@ -11,7 +11,7 @@ A ChatGPT Vim plugin, an OpenAI Neovim plugin, and so much more! Neural integrat
 * Focused on privacy and avoiding leaking data to third parties
 * Easily ask AI to explain code or paragraphs `:NeuralExplain`
 * Compatible with Vim 8.0+ & Neovim 0.8+
-* Supported on Linux, Mac OSX, and Windows
+* Supports Linux, Mac OSX, and Windows
 * Only dependency is Python 3.7+
 
 Experience lightning-fast code generation and completion with asynchronous
@@ -28,6 +28,7 @@ them for a better experience.
 
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim) - for Neovim UI support
 - [significant.nvim](https://github.com/ElPiloto/significant.nvim) - for Neovim animated signs
+- [nvim-notify](https://github.com/rcarriga/nvim-notify) - for Neovim animated notifications
 - [ALE](https://github.com/dense-analysis/ale) - For correcting problems with
   generated code
 

@@ -5,7 +5,7 @@ let s:current_job = get(s:, 'current_count_job', 0)
 
 function! s:HandleOutputEnd(job_data, exit_code) abort
     if a:exit_code == 0
-        let l:output = a:job_data.output_lines[0]
+        let l:output = 'Tokens: ' . a:job_data.output_lines[0]
 
         if has('nvim')
             execute 'lua require(''neural.notify'').info("' . l:output . '")'

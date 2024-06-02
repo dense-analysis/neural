@@ -28,9 +28,21 @@ endfunction
 
 function! s:JoinNeovimOutput(job, last_line, data, mode, callback) abort
     if a:mode is# 'raw'
-        call a:callback(a:job, join(a:data, "\n"))
+        " Neovim stream event handlers receive data as it becomes available
+        " from the OS, thus the first and last items in the data list may be
+        " partial lines.
+        " Each stream item is passed to the callback individually which can be
+        " a chunk of text or a newline character.
+        " echoerr a:data
+        if len(a:data) > 1
+            for text in a:data
+                call a:callback(a:job, [text])
+            endfor
+        else
+            call a:callback(a:job, a:data)
+        endif
 
-        return ''
+        return
     endif
 
     let l:lines = a:data[:-2]

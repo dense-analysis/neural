@@ -14,7 +14,7 @@ let s:defaults = {
 \   'ui': {
 \       'prompt_enabled': v:true,
 \       'prompt_icon': '🗲',
-\       'animated_sign_enabled': v:true,
+\       'animated_sign_enabled': v:false,
 \       'echo_enabled': v:true,
 \   },
 \   'buffer': {
@@ -36,7 +36,7 @@ let s:defaults = {
 \           'api_key': '',
 \           'frequency_penalty': 0.1,
 \           'max_tokens': 2048,
-\           'model': 'gpt-3.5-turbo',
+\           'model': 'gpt-4',
 \           'presence_penalty': 0.1,
 \           'temperature': 0.2,
 \           'top_p': 1,

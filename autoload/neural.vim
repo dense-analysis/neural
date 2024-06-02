@@ -51,47 +51,6 @@ function! neural#OutputErrorMessage(message) abort
     endif
 endfunction
 
-function! s:AddLineToBuffer(buffer, job_data, line) abort
-    " Add lines either if we can add them to the buffer which is no longer the
-    " current one, or otherwise only if we're still in the same buffer.
-    if bufnr('') isnot a:buffer && !exists('*appendbufline')
-        return
-    endif
-
-    let l:moving_line = a:job_data.moving_line
-    let l:started = a:job_data.content_started
-
-    " Skip introductory empty lines.
-    if !l:started && len(a:line) == 0
-        return
-    endif
-
-    " Check if we need to re-position the cursor to stop it appearing to move
-    " down as lines are added.
-    let l:pos = getpos('.')
-    let l:last_line = len(getbufline(a:buffer, 1, '$'))
-    let l:move_up = 0
-
-    if l:pos[1] == l:last_line
-        let l:move_up = 1
-    endif
-
-    " appendbufline isn't available in old Vim versions.
-    if bufnr('') is a:buffer
-        call append(l:moving_line, a:line)
-    else
-        call appendbufline(a:buffer, l:moving_line, a:line)
-    endif
-
-    " Move the cursor back up again to make content appear below.
-    if l:move_up
-        call setpos('.', l:pos)
-    endif
-
-    let a:job_data.moving_line = l:moving_line + 1
-    let a:job_data.content_started = 1
-endfunction
-
 function! s:AddErrorLine(buffer, job_data, line) abort
     call add(a:job_data.error_lines, a:line)
 endfunction
@@ -313,10 +272,11 @@ function! neural#Run(prompt, options) abort
     \   'moving_line': l:moving_line,
     \   'error_lines': [],
     \   'content_started': 0,
+    \   'content_ended': 0,
     \}
     let l:job_id = neural#job#Start(l:command, {
-    \   'mode': 'nl',
-    \   'out_cb': {job_id, line -> s:AddLineToBuffer(l:buffer, l:job_data, line)},
+    \   'mode': 'raw',
+    \   'out_cb': {job_id, text -> neural#handler#AddTextToBuffer(l:buffer, l:job_data, text)},
     \   'err_cb': {job_id, line -> s:AddErrorLine(l:buffer, l:job_data, line)},
     \   'exit_cb': {job_id, exit_code -> s:HandleOutputEnd(l:buffer, l:job_data, exit_code)},
     \})

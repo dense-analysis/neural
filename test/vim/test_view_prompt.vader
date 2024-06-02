@@ -1,4 +1,12 @@
+Before:
+  Save g:neural
+
+  unlet! g:neural
+  let g:output = ''
+
 After:
+  Restore
+
   unlet! g:output
 
 Given markdown(An empty Markdown file):

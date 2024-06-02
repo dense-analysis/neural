@@ -11,8 +11,11 @@ Before:
     call add(g:calls, ['neural#Run', a:prompt, a:options])
   endfunction
 
+  let g:output = ''
+
 After:
   unlet! g:calls
+  unlet! g:output
 
   runtime autoload/neural/job.vim
 

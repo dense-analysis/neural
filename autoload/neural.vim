@@ -294,6 +294,9 @@ endfunction
 
 " Print the prompt that Neural will use in full.
 function! neural#ViewPrompt(...) abort
+    " Reload the Neural config on a prompt request if needed.
+    call neural#config#Load()
+
     " Take the first argument or nothing.
     let l:prompt = get(a:000, 0, '')
     let l:buffer = bufnr('')

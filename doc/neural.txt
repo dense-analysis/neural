@@ -102,6 +102,18 @@ appropriate value. OpenAI is the default data source.
   |g:neural.set_default_keybinds| to any falsy value.
 
 
+`:NeuralViewPrompt`                                          *NeuralViewPrompt*
+
+  View the complete prompt that will be sent. e.g. `:NeuralViewPrompt say hello`
+
+  Neural will automatically alter prompts sent to virtual assistants before
+  they are sent depending on the filetype of the current file and the
+  surrounding context. This command allows you to see what that prompt will be
+  before it is sent.
+
+  A plug mapping `<Plug>(neural_view_prompt)` is defined for this.
+
+
 ===============================================================================
 4. Options                                                     *neural-options*
                                                                      *g:neural*

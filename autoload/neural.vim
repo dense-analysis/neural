@@ -292,6 +292,26 @@ function! neural#Prompt(prompt) abort
     call neural#Run(a:prompt, {})
 endfunction
 
+" Print the prompt that Neural will use in full.
+function! neural#ViewPrompt(...) abort
+    " Take the first argument or nothing.
+    let l:prompt = get(a:000, 0, '')
+    let l:buffer = bufnr('')
+    let l:source = s:LoadDataSource()
+    let l:input = s:GetSourceInput(l:buffer, l:source, l:prompt)
+
+    " no-custom-checks
+    echohl Question
+    " no-custom-checks
+    echo 'The following prompt will be sent.'
+    " no-custom-checks
+    echohl None
+    " no-custom-checks
+    echo "\n"
+    " no-custom-checks
+    echo l:input.prompt
+endfunction
+
 function! neural#Run(prompt, options) abort
     let l:buffer = bufnr('')
 

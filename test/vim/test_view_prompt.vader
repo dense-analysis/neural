@@ -1,0 +1,27 @@
+After:
+  unlet! g:output
+
+Given markdown(An empty Markdown file):
+Execute(An empty markdown prompt should be explained correctly):
+  redir => g:output
+    silent NeuralViewPrompt
+  redir END
+
+  AssertEqual
+  \ [
+  \   'The following prompt will be sent.',
+  \   'Write text in a markdown file. '
+  \ ],
+  \ sort(filter(split(g:output, "\n"), '!empty(v:val)'))
+
+Execute(A markdown prompt with some text should be explained correctly):
+  redir => g:output
+    silent NeuralViewPrompt here is some text
+  redir END
+
+  AssertEqual
+  \ [
+  \   'The following prompt will be sent.',
+  \   'Write text in a markdown file. here is some text'
+  \ ],
+  \ sort(filter(split(g:output, "\n"), '!empty(v:val)'))

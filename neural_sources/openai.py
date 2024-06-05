@@ -3,7 +3,6 @@ A Neural datasource for loading generated text via OpenAI.
 """
 import json
 import platform
-import re
 import ssl
 import sys
 import urllib.error
@@ -109,19 +108,21 @@ def get_openai_completion(config: Config, prompt: str) -> None:
                     openai_obj = json.loads(line_data)
                     openai_text = openai_obj["choices"][0]["text"]
 
-                    # Split the text at each newline, keeping the newline characters
-                    split_text = re.split(r"(\n)", openai_text)
-
-                    for segment in split_text:
+                    print(openai_text, end="", flush=True)
+                    # # Split the text at each newline, keeping the newline characters
+                    # split_text = re.split(r"(\n)", openai_text)
+                    #
+                    # for segment in split_text:
+                    #     print(segment, flush=True)
                         # time.sleep(0.05)
-                        if segment == "\n":
-                            # Signal End of Text for buffer line.
-                            print(end=ETX, flush=True)
-                        else:
-                            print(segment, flush=True)
+                        # if segment == "\n":
+                        #     # Signal End of Text for buffer line.
+                        #     print(end=ETX, flush=True)
+                        # else:
+                        #     print(segment, flush=True)
 
     # Signal End of Transmission.
-    print(end=EOT, flush=True)
+    # print(end=EOT, flush=True)
 
 
 def load_config(raw_config: Dict[str, Any]) -> Config:

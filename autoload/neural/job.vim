@@ -34,13 +34,15 @@ function! s:JoinNeovimOutput(job, last_line, data, mode, callback) abort
         " Each stream item is passed to the callback individually which can be
         " a chunk of text or a newline character.
         " echoerr a:data
-        if len(a:data) > 1
-            for text in a:data
-                call a:callback(a:job, [text])
-            endfor
-        else
-            call a:callback(a:job, a:data)
-        endif
+        call a:callback(a:job, join(a:data, "\n"))
+
+        " if len(a:data) > 1
+        "     for text in a:data
+        "         call a:callback(a:job, [text])
+        "     endfor
+        " else
+        "     call a:callback(a:job, a:data)
+        " endif
 
         return
     endif

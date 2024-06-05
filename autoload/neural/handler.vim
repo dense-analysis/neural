@@ -1,87 +1,97 @@
+scriptencoding utf8
+
 " Author: Anexon <anexon@protonmail.com>
 " Description: APIs for working with Asynchronous jobs, with an API normalised
 " between Vim 8 and NeoVim.
 
+
+if has('nvim') && !exists('s:ns_id')
+    let s:ns_id = nvim_create_namespace('neural')
+endif
+
 function! neural#handler#AddTextToBuffer(buffer, job_data, stream_data) abort
-    if bufnr('') isnot a:buffer && !exists('*appendbufline')
-    \ || !a:job_data.content_started && len(a:stream_data) == 0
-    \ || a:job_data.content_ended
+    if (bufnr('') isnot a:buffer && !exists('*appendbufline')) || len(a:stream_data) == 0
         return
     endif
 
     let l:leader = ' 🔸🔶'
+    let l:hl_group = 'ALEInfo'
+    let l:text = a:stream_data
 
     " echoerr a:stream_data
     "
 
     " We need to handle creating new lines in the buffer separately to appending
     " content to an existing line due to Vim/Neovim API design.
-    for text in a:stream_data
-        " Don't write empty or null characters to the buffer.
-        " Replace null characters (^@) with nothing or a space, depending on your needs
-        let text = substitute(text, '\%x03', '<X>', 'g')
-        let text = substitute(text, '\%x00', '', 'g')
-        " let text = substitute(text, '\\n', '|||', 'g')
+    " if text is? ''
+    " endif
 
-        " echoerr text
-        " if text is? '' || match(text, '\%x10') != -1 || match(text, '\%x00') != -1
-        if text is? ''
-            continue
-        elseif text is? '\n' || text is? '<X>'|| match(text, '\%x03') != -1 || text is? '^C'
-            " Check if we need to re-position the cursor to stop it appearing to move
-            " down as lines are added.
-            let l:pos = getpos('.')
-            let l:last_line = len(getbufline(a:buffer, 1, '$'))
-            let l:move_up = 0
 
-            if l:pos[1] == l:last_line
-                let l:move_up = 1
-            endif
+    " Check if we need to re-position the cursor to stop it appearing to move
+    " down as lines are added.
+    let l:pos = getpos('.')
+    let l:last_line = len(getbufline(a:buffer, 1, '$'))
+    let l:move_up = 0
+    let l:new_lines = split(a:stream_data, "\n")
 
-            " appendbufline isn't available in old Vim versions.
-            if bufnr('') is a:buffer
-                call append(a:job_data.moving_line, '')
-            else
-                call appendbufline(a:buffer, a:job_data.moving_line, '')
-            endif
+    if l:pos[1] == l:last_line
+        let l:move_up = 1
+    endif
 
-            " Cleanup leader
-            let l:line_content = getbufline(a:buffer, a:job_data.moving_line)
-            call setbufline(a:buffer, a:job_data.moving_line, l:line_content[0][0:-len(l:leader)-1])
+    if empty(l:new_lines)
+        return
+    endif
 
-            " call setpos('.', getpos('.')[1])
+    " Cleanup leader
+    let l:line_content = getbufline(a:buffer, a:job_data.moving_line)
+    let l:new_lines[0] = get(l:line_content, 0, '') . l:new_lines[0]
 
-            " Move the cursor back up again to make content appear below.
-            " if l:move_up
-            "     call setpos('.', l:pos)
-            " endif
+    if has('nvim')
+        call nvim_buf_set_lines(a:buffer, a:job_data.moving_line-1, a:job_data.moving_line, 0, l:new_lines)
+    else
+        echom string(l:new_lines)
+        call setbufline(a:buffer, a:job_data.moving_line, l:new_lines)
+    endif
 
-            let a:job_data.moving_line += 1
-        " elseif text is? '<<[EOF]>>'
-        elseif match(text, '\%x04') != -1
-          " Strip out leader character/s at the end of the stream.
-            let l:line_content = getbufline(a:buffer, a:job_data.moving_line)
+    " Move the cursor back up again to make content appear below.
+    if l:move_up
+        call setpos('.', l:pos)
+    endif
 
-            if len(l:line_content) != 0
-                let l:new_line_content = l:line_content[0][0:-len(l:leader)-1]
-            endif
+    let a:job_data.moving_line += len(l:new_lines)-1
 
-            call setbufline(a:buffer, a:job_data.moving_line, l:new_line_content)
-            let a:job_data.content_ended = 1
-        else
-            let a:job_data.content_started = 1
-            " Prepend any current line content with the incoming stream text.
-            let l:line_content = getbufline(a:buffer, a:job_data.moving_line)
-
-            if len(l:line_content) == 0
-                let l:new_line_content = text . l:leader
-            else
-                let l:new_line_content = l:line_content[0][0:-len(l:leader)-1] . text . l:leader
-            endif
-
-            call setbufline(a:buffer, a:job_data.moving_line, l:new_line_content)
-        endif
-    endfor
+    if has('nvim')
+        call nvim_buf_set_virtual_text(
+        \   a:buffer,
+        \   s:ns_id,  a:job_data.moving_line - 1,
+        \   [[l:leader, l:hl_group]],
+        \   {}
+        \)
+    endif
+    " elseif text is? '<<[EOF]>>'
+    " elseif match(text, '\%x04') != -1
+    "   " Strip out leader character/s at the end of the stream.
+    "     let l:line_content = getbufline(a:buffer, a:job_data.moving_line)
+    "
+    "     if len(l:line_content) != 0
+    "         let l:new_line_content = l:line_content[0][0:-len(l:leader)-1]
+    "     endif
+    "
+    "     call setbufline(a:buffer, a:job_data.moving_line, l:new_line_content)
+    "     let a:job_data.content_ended = 1
+    " else
+    "     let a:job_data.content_started = 1
+    "     " Prepend any current line content with the incoming stream text.
+    "     let l:line_content = getbufline(a:buffer, a:job_data.moving_line)
+    "
+    "     if len(l:line_content) == 0
+    "         let l:new_line_content = text . l:leader
+    "     else
+    "         let l:new_line_content = l:line_content[0][0:-len(l:leader)-1] . text . l:leader
+    "     endif
+    "
+    "     call setbufline(a:buffer, a:job_data.moving_line, l:new_line_content)
+    " endif
 endfunction
 
 function! neural#handler#AddLineToBuffer(buffer, job_data, line) abort

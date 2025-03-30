@@ -175,6 +175,16 @@ def test_main_function_bad_config():
             'OpenAI request failure: Too much text for a request!',
             id="too_much_text",
         ),
+        pytest.param(
+            401,
+            json.dumps({
+                'error': {
+                    'message': "Bad authentication error",
+                },
+            }),
+            'OpenAI request failure: Bad authentication error',
+            id="unauthorised_failure",
+        ),
     )
 )
 def test_api_error(

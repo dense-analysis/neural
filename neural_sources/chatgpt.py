@@ -191,7 +191,7 @@ def main() -> None:
     try:
         get_chatgpt_completion(config, input_data["prompt"])
     except urllib.error.HTTPError as error:
-        if error.code == 400:
+        if error.code == 400 or error.code == 401:
             message = get_error_message(error)
             sys.exit('Neural error: OpenAI request failure: ' + message)
         elif error.code == 429:

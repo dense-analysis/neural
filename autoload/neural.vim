@@ -297,6 +297,36 @@ function! neural#Prompt(prompt) abort
     call neural#Run(a:prompt, {})
 endfunction
 
+function! neural#PromptEdit(prompt) abort
+    " Reload the Neural config on a prompt request if needed.
+    call neural#config#Load()
+    call neural#Cleanup()
+    if empty(a:prompt)
+        if has('nvim') && g:neural.ui.prompt_enabled
+            call neural#OpenPrompt()
+        else
+            call neural#ComplainNoPromptText()
+        endif
+        return
+    endif
+    let l:range = neural#visual#GetRange()
+    let l:options = {
+    \   'line': l:range.lnum,
+    \   'echo': 0,
+    \   'range': l:range,
+    \}
+    " Result includes actual newlines.
+    let l:special_prompt = '\n\n' .
+          \ 'RETURN ONLY COMPLETE CODE THAT WOULD DIRECTLY REPLACE THE CODE IN THE GIVEN BLOCK.' .
+          \ 'DO NOT PROVIDE ANY EXPLANATIONS BEFORE OR AFTER - JUST CODE!' .
+          \ 'DO NOT ADD ANY MARKDOWN CODE BLOCKS - ASSUME YOUR OUTPUT HAS CODE BLOCKS' .
+          \ 'THE OUTPUT SHOULD BE ASSUMED TO BE IN JUST ONE FILE' .
+          \ 'IF NEW METHODS, CLASSES ETC ARE DEFINED, DEFINE THEM BEFORE AS THOUGH RESTRICTED TO A SINGLE FILE'
+
+    let l:input = a:prompt . '\n```' . join(l:range.selection, "\n") . '\n```' . l:special_prompt
+    call neural#Run(l:input, l:options)
+endfunction
+
 " Print the prompt that Neural will use in full.
 function! neural#ViewPrompt(...) abort
     " Reload the Neural config on a prompt request if needed.

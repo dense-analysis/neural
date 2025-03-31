@@ -31,6 +31,8 @@ endif
 
 " Have Neural write to the buffer given a prompt.
 command! -nargs=? Neural :call neural#Prompt(<q-args>)
+" Command definition
+command! -nargs=? -range NeuralEdit :call neural#PromptEdit(<q-args>)
 " Stop Neural doing anything.
 command! -nargs=0 NeuralStop :call neural#Stop()
 " Create a completion buffer.

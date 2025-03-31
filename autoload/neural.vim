@@ -65,6 +65,11 @@ function! s:AddLineToBuffer(buffer, job_data, line) abort
         return
     endif
 
+    " Delete range from buffer if editing selection
+    if !l:started && !empty(a:job_data.range)
+        call deletebufline(a:buffer, a:job_data.range.lnum, a:job_data.range.end_lnum)
+    endif
+
     " Check if we need to re-position the cursor to stop it appearing to move
     " down as lines are added.
     let l:pos = getpos('.')

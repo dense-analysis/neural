@@ -59,8 +59,8 @@ appropriate value. OpenAI is the default data source.
 `:NeuralBuffer`                                                  *NeuralBuffer*
 
   Create a buffer with a `neuralbuf` filetype for interacting with neural
-  sources directly. This can be a useful scratch buffer and playground for code
-  generation and completion.
+  providers directly. This can be a useful scratch buffer and playground for
+  code generation and completion.
 
   - See |neural-buffer| for configuration options.
   - See |NeuralCompletion| for running neural completions in the buffer.

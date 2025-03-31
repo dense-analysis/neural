@@ -8,7 +8,7 @@ from unittest import mock
 
 import pytest
 
-from neural_sources import chatgpt
+from neural_providers import chatgpt
 
 
 def get_valid_config() -> Dict[str, Any]:

@@ -1,5 +1,5 @@
 " Author: Anexon <anexon@protonmail.com>
-" Description: Neural Buffer for interacting with neural sources directly.
+" Description: Neural Buffer for interacting with neural providers directly.
 
 call neural#config#Load()
 

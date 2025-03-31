@@ -1,6 +1,6 @@
 " Author: Anexon <anexon@protonmail.com>
 " Description: A Neural Scratch Buffer acts as a playground for interacting with
-" Neural sources directly, sending all content of the buffer to the source.
+" Neural providers directly, sending all content of the buffer to the source.
 
 scriptencoding utf-8
 

@@ -334,6 +334,7 @@ function! neural#Run(prompt, options) abort
     let l:job_data = {
     \   'moving_line': l:moving_line,
     \   'error_lines': [],
+    \   'range': get(a:options, 'range'),
     \   'content_started': 0,
     \}
     let l:job_id = neural#job#Start(l:command, {

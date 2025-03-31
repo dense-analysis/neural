@@ -317,11 +317,11 @@ function! neural#PromptEdit(prompt) abort
     \}
     " Result includes actual newlines.
     let l:special_prompt = '\n\n' .
+          \ 'Formatting Rules.\n' .
           \ 'RETURN ONLY COMPLETE CODE THAT WOULD DIRECTLY REPLACE THE CODE IN THE GIVEN BLOCK.' .
           \ 'DO NOT PROVIDE ANY EXPLANATIONS BEFORE OR AFTER - JUST CODE!' .
-          \ 'DO NOT ADD ANY MARKDOWN CODE BLOCKS - ASSUME YOUR OUTPUT HAS CODE BLOCKS' .
           \ 'THE OUTPUT SHOULD BE ASSUMED TO BE IN JUST ONE FILE' .
-          \ 'IF NEW METHODS, CLASSES ETC ARE DEFINED, DEFINE THEM BEFORE AS THOUGH RESTRICTED TO A SINGLE FILE'
+          \ 'DO NOT ADD ANY MARKDOWN CODE BLOCKS.'
 
     let l:input = a:prompt . '\n```' . join(l:range.selection, "\n") . '\n```' . l:special_prompt
     call neural#Run(l:input, l:options)

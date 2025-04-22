@@ -235,12 +235,13 @@ function! neural#PreProcess(buffer, input) abort
 endfunction
 
 function! s:LoadDataSource() abort
-    let l:selected = g:neural.selected
+    " TODO: Change message if nothing is selected.
+    let l:type = get(g:neural.sources, 0, {'type': ''}).type
 
     try
-        let l:source = function('neural#source#' . selected . '#Get')()
+        let l:source = function('neural#source#' . l:type . '#Get')()
     catch /E117/
-        call neural#OutputErrorMessage('Invalid source: ' . l:selected)
+        call neural#OutputErrorMessage('Invalid source: ' . l:type)
 
         return
     endtry
@@ -249,7 +250,8 @@ function! s:LoadDataSource() abort
 endfunction
 
 function! s:GetSourceInput(buffer, source, prompt) abort
-    let l:config = get(g:neural.source, a:source.name, {})
+    " FIXME: Pass the config around.
+    let l:config = get(g:neural.sources, 0, {})
 
     " If the config is not a Dictionary, throw it away.
     if type(l:config) isnot v:t_dict

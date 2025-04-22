@@ -1,0 +1,7 @@
+* Rename autoload source file to provider
+* Print a nice message when you have no sources
+* Pass the config for the selected source across
+* Update tests for configuration
+* Update other tests?
+* Make the chat thing look for the first chat-capable source
+* Move the use_chat_api default from Python to Vim script

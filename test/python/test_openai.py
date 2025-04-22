@@ -11,10 +11,10 @@ import pytest
 from neural_providers import openai
 
 
-def get_valid_config() -> Dict[str, Any]:
+def get_valid_config(model: str = "foo") -> Dict[str, Any]:
     return {
         "api_key": ".",
-        "model": "foo",
+        "model": model,
         "prompt": "say hello",
         "temperature": 1,
         "top_p": 1,
@@ -33,29 +33,34 @@ def test_load_config_errors():
     config: Dict[str, Any] = {}
 
     for modification, expected_error in [
-        ({}, "openai.api_key is not defined"),
-        ({"api_key": ""}, "openai.api_key is not defined"),
-        ({"api_key": "."}, "openai.model is not defined"),
-        ({"model": ""}, "openai.model is not defined"),
+        ({"url": 1}, "url must be a string"),
+        ({"url": "x"}, "url must start with http(s)://"),
+        ({"url": "https://x", "api_key": ""}, "api_key is not defined"),
+        ({"api_key": "."}, "model is not defined"),
+        ({"model": ""}, "model is not defined"),
         (
-            {"model": "x", "temperature": "x"},
-            "openai.temperature is invalid"
+            {"model": "x", "use_chat_api": 1},
+            "use_chat_api must be true or false"
+        ),
+        (
+            {"use_chat_api": None, "temperature": "x"},
+            "temperature is invalid"
         ),
         (
             {"temperature": 1, "top_p": "x"},
-            "openai.top_p is invalid"
+            "top_p is invalid"
         ),
         (
             {"top_p": 1, "max_tokens": "x"},
-            "openai.max_tokens is invalid"
+            "max_tokens is invalid"
         ),
         (
             {"max_tokens": 1, "presence_penalty": "x"},
-            "openai.presence_penalty is invalid"
+            "presence_penalty is invalid"
         ),
         (
             {"presence_penalty": 1, "frequency_penalty": "x"},
-            "openai.frequency_penalty is invalid"
+            "frequency_penalty is invalid"
         ),
     ]:
         config.update(modification)
@@ -66,11 +71,46 @@ def test_load_config_errors():
         assert str(exc.value) == expected_error, config
 
 
+def test_automatic_completions_api_usage():
+    raw_config = get_valid_config()
+
+    for model in (
+        'ada',
+        'babbage',
+        'curie',
+        'davinci',
+        'gpt-3.5-turbo-instruct',
+        'text-ada-001',
+        'text-babbage-001',
+        'text-curie-001',
+        'text-davinci-002',
+        'text-davinci-003',
+    ):
+        raw_config['model'] = model
+
+        assert openai.load_config(raw_config).use_chat_api is False
+
+    for model in ('gpt-3.5', 'gpt-4'):
+        raw_config['model'] = model
+
+        assert openai.load_config(raw_config).use_chat_api is True
+
+
+def test_url_configuration():
+    raw_config = get_valid_config()
+
+    assert openai.load_config(raw_config).url == 'https://api.openai.com'
+
+    raw_config['url'] = 'http://myhost'
+
+    assert openai.load_config(raw_config).url == 'http://myhost'
+
+
 def test_main_function_rate_other_error():
     with mock.patch.object(sys.stdin, 'readline') as readline_mock, \
-        mock.patch.object(openai, 'get_openai_completion') as completion_mock:
+        mock.patch.object(openai, 'get_openai_completion') as compl_mock:
 
-        completion_mock.side_effect = urllib.error.HTTPError(
+        compl_mock.side_effect = urllib.error.HTTPError(
             url='',
             msg='',
             hdrs=mock.Mock(),
@@ -86,7 +126,7 @@ def test_main_function_rate_other_error():
             openai.main()
 
 
-def test_print_openai_results():
+def test_print_openai_completion_results():
     result_data = (
         b'data: {"id": "cmpl-6jMlRJtbYTGrNwE6Lxy1Ns1EtD0is", "object": "text_completion", "created": 1676270285, "choices": [{"text": "\\n", "index": 0, "logprobs": null, "finish_reason": null}], "model": "gpt-3.5-turbo-instruct"}\n'  # noqa
         b'\n'
@@ -109,7 +149,7 @@ def test_print_openai_results():
         urlopen_mock.return_value.__enter__.return_value = BytesIO(result_data)
 
         readline_mock.return_value = json.dumps({
-            "config": get_valid_config(),
+            "config": get_valid_config("gpt-3.5-turbo-instruct"),
             "prompt": "hello there",
         })
         openai.main()
@@ -120,6 +160,51 @@ def test_print_openai_results():
         mock.call('Hello', end='', flush=True),
         mock.call('!', end='', flush=True),
         mock.call('', end='', flush=True),
+        mock.call(),
+    ]
+
+
+def test_print_openai_chat_completion_results():
+    result_data = (
+        b'data: {"id":"chatcmpl-6tMwjovREOTA84MkGBOS5rWyj1izv","object":"chat.completion.chunk","created":1678654265,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"role":"assistant"},"index":0,"finish_reason":null}]}\n'  # noqa
+        b'\n'
+        b'data: {"id":"chatcmpl-6tMwjovREOTA84MkGBOS5rWyj1izv","object":"chat.completion.chunk","created":1678654265,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":"\\n\\n"},"index":0,"finish_reason":null}]}\n'  # noqa
+        b'\n'
+        b'data: {"id":"chatcmpl-6tMwjovREOTA84MkGBOS5rWyj1izv","object":"chat.completion.chunk","created":1678654265,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":"This"},"index":0,"finish_reason":null}]}\n'  # noqa
+        b'\n'
+        b'data: {"id":"chatcmpl-6tMwjovREOTA84MkGBOS5rWyj1izv","object":"chat.completion.chunk","created":1678654265,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":" is"},"index":0,"finish_reason":null}]}\n'  # noqa
+        b'\n'
+        b'data: {"id":"chatcmpl-6tMwjovREOTA84MkGBOS5rWyj1izv","object":"chat.completion.chunk","created":1678654265,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":" a"},"index":0,"finish_reason":null}]}\n'  # noqa
+        b'\n'
+        b'data: {"id":"chatcmpl-6tMwjovREOTA84MkGBOS5rWyj1izv","object":"chat.completion.chunk","created":1678654265,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":" test"},"index":0,"finish_reason":null}]}\n'  # noqa
+        b'\n'
+        b'data: {"id":"chatcmpl-6tMwjovREOTA84MkGBOS5rWyj1izv","object":"chat.completion.chunk","created":1678654265,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":"."},"index":0,"finish_reason":null}]}\n'  # noqa
+        b'\n'
+        b'data: {"id":"chatcmpl-6tMwjovREOTA84MkGBOS5rWyj1izv","object":"chat.completion.chunk","created":1678654265,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{},"index":0,"finish_reason":"length"}]}\n'  # noqa
+        b'\n'
+        b'data: [DONE]\n'
+        b'\n'
+    )
+
+    with mock.patch.object(sys.stdin, 'readline') as readline_mock, \
+        mock.patch.object(urllib.request, 'urlopen') as urlopen_mock, \
+        mock.patch('builtins.print') as print_mock:
+
+        urlopen_mock.return_value.__enter__.return_value = BytesIO(result_data)
+
+        readline_mock.return_value = json.dumps({
+            "config": get_valid_config("gpt-3.5-turbo-0301"),
+            "prompt": "Say this is a test",
+        })
+        openai.main()
+
+    assert print_mock.call_args_list == [
+        mock.call('\n\n', end='', flush=True),
+        mock.call('This', end='', flush=True),
+        mock.call(' is', end='', flush=True),
+        mock.call(' a', end='', flush=True),
+        mock.call(' test', end='', flush=True),
+        mock.call('.', end='', flush=True),
         mock.call(),
     ]
 

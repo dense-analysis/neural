@@ -5,8 +5,22 @@ scriptencoding utf-8
 " Track modifications to g:neural, in case we set it again.
 let s:last_dictionary = get(s:, 'last_dictionary', {})
 
+" TODO: Default use_chat_api value here instead of in Python?
+let s:source_defaults = {
+\   'openai': {
+\       'url': 'https://api.openai.com',
+\       'api_key': '',
+\       'frequency_penalty': 0.1,
+\       'max_tokens': 1024,
+\       'model': 'gpt-3.5-turbo-instruct',
+\       'use_chat_api': v:false,
+\       'presence_penalty': 0.1,
+\       'temperature': 0.2,
+\       'top_p': 1,
+\   },
+\}
+
 let s:defaults = {
-\   'selected': 'openai',
 \   'pre_process': {
 \       'enabled': v:true,
 \   },
@@ -22,26 +36,7 @@ let s:defaults = {
 \       'create_mode': 'vertical',
 \       'wrap': v:true,
 \   },
-\   'source': {
-\       'openai': {
-\           'api_key': '',
-\           'frequency_penalty': 0.1,
-\           'max_tokens': 1024,
-\           'model': 'gpt-3.5-turbo-instruct',
-\           'presence_penalty': 0.1,
-\           'temperature': 0.2,
-\           'top_p': 1,
-\       },
-\       'chatgpt': {
-\           'api_key': '',
-\           'frequency_penalty': 0.1,
-\           'max_tokens': 2048,
-\           'model': 'gpt-3.5-turbo',
-\           'presence_penalty': 0.1,
-\           'temperature': 0.2,
-\           'top_p': 1,
-\       },
-\   },
+\   'sources': [],
 \}
 
 function! neural#config#DeepMerge(into, from) abort
@@ -56,16 +51,57 @@ function! neural#config#DeepMerge(into, from) abort
     return a:into
 endfunction
 
-function! s:ApplySpecialDefaults() abort
-    if empty(g:neural.source.chatgpt.api_key)
-        let g:neural.source.chatgpt.api_key = g:neural.source.openai.api_key
-    endif
-endfunction
-
 " Set the shared configuration for Neural.
 function! neural#config#Set(settings) abort
     let g:neural = a:settings
     call neural#config#Load()
+endfunction
+
+function! neural#config#ConvertLegacySettings(dictionary) abort
+    " Replace 'source' with newer 'sources'
+    if has_key(a:dictionary, 'source') && !has_key(a:dictionary, 'sources')
+        let l:source = remove(a:dictionary, 'source')
+        let a:dictionary.sources = []
+
+        if type(l:source) is v:t_dict
+            " Keep old behavior to default the chatgpt key to the openai key.
+            let l:default_api_key = get(get(l:source, 'openai', {}), 'api_key', '')
+
+            for [l:type, l:settings] in items(l:source)
+                let l:settings = copy(l:settings)
+                let l:settings.use_chat_api = l:type is# 'chatgpt' ? v:true : v:false
+                let l:settings.type = l:type is# 'chatgpt' ? 'openai' : l:type
+
+                if empty(get(l:settings, 'api_key'))
+                    let l:settings.api_key = l:default_api_key
+                endif
+
+                call add(a:dictionary.sources, l:settings)
+            endfor
+        endif
+    endif
+
+    " Remove the 'selected' key if set.
+    if has_key(a:dictionary, 'selected')
+        call remove(a:dictionary, 'selected')
+    endif
+endfunction
+
+function! neural#config#MergeSourceDefaults(sources) abort
+    let l:merged_sources = []
+
+    if type(a:sources) is v:t_list
+        for l:source in a:sources
+            let l:type = get(l:source, 'type', v:null)
+
+            call add(l:merged_sources, neural#config#DeepMerge(
+            \   deepcopy(get(s:source_defaults, l:type, {})),
+            \   l:source,
+            \))
+        endfor
+    endif
+
+    return l:merged_sources
 endfunction
 
 function! neural#config#Load() abort
@@ -73,11 +109,17 @@ function! neural#config#Load() abort
 
     " Merge the Dictionary with defaults again if g:neural changed.
     if l:dictionary isnot# s:last_dictionary
+        " Create a shallow copy to modify
+        let l:dictionary = copy(l:dictionary)
+        call neural#config#ConvertLegacySettings(l:dictionary)
+        let l:dictionary.sources = neural#config#MergeSourceDefaults(
+        \   get(l:dictionary, 'sources', v:null)
+        \)
+
         let s:last_dictionary = neural#config#DeepMerge(
         \   deepcopy(s:defaults),
         \   l:dictionary,
         \)
         let g:neural = s:last_dictionary
-        call s:ApplySpecialDefaults()
     endif
 endfunction

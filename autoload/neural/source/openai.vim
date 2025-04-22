@@ -1,5 +1,5 @@
 " Author: w0rp <devw0rp@gmail.com>
-" Description: A script describing how to use OpenAI with Neural
+" Description: A script describing how to use OpenAI compatible APIs with Neural
 
 function! neural#source#openai#Get() abort
     return {

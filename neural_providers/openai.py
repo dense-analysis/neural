@@ -181,13 +181,8 @@ def main() -> None:
     try:
         get_openai_completion(config, input_data["prompt"])
     except urllib.error.HTTPError as error:
-        if error.code == 400 or error.code == 401:
-            message = get_error_message(error)
-            sys.exit('Neural error: OpenAI request failure: ' + message)
-        elif error.code == 429:
-            sys.exit("Neural error: OpenAI request limit reached!")
-        else:
-            raise
+        message = get_error_message(error)
+        sys.exit('Neural error [OpenAI]: ' + message)
 
 
 if __name__ == "__main__":  # pragma: no cover

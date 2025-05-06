@@ -142,20 +142,20 @@ def test_main_function_bad_config():
     (
         pytest.param(
             429,
-            None,
-            'OpenAI request limit reached!',
+            json.dumps({'error': {}}),
+            '{"error": {}}',
             id="request_limit",
         ),
         pytest.param(
             400,
             '{]',
-            'OpenAI request failure: {]',
+            '{]',
             id="error_with_mangled_json",
         ),
         pytest.param(
             400,
             json.dumps({'error': {}}),
-            'OpenAI request failure: {"error": {}}',
+            '{"error": {}}',
             id="error_with_missing_message_key",
         ),
         pytest.param(
@@ -165,7 +165,7 @@ def test_main_function_bad_config():
                     'message': "This model's maximum context length is 123",
                 },
             }),
-            'OpenAI request failure: Too much text for a request!',
+            'Too much text for a request!',
             id="too_much_text",
         ),
         pytest.param(
@@ -175,7 +175,7 @@ def test_main_function_bad_config():
                     'message': "Bad authentication error",
                 },
             }),
-            'OpenAI request failure: Bad authentication error',
+            'Bad authentication error',
             id="unauthorised_failure",
         ),
     )
@@ -204,4 +204,4 @@ def test_api_error(
         with pytest.raises(SystemExit) as exc:
             openai.main()
 
-    assert str(exc.value) == f'Neural error: {expected_message}'
+    assert str(exc.value) == f'Neural error [OpenAI]: {expected_message}'

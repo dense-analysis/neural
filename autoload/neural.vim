@@ -301,6 +301,7 @@ function! neural#PromptEdit(prompt) abort
     " Reload the Neural config on a prompt request if needed.
     call neural#config#Load()
     call neural#Cleanup()
+
     if empty(a:prompt)
         if has('nvim') && g:neural.ui.prompt_enabled
             call neural#OpenPrompt()
@@ -309,22 +310,28 @@ function! neural#PromptEdit(prompt) abort
         endif
         return
     endif
+
     let l:range = neural#visual#GetRange()
     let l:options = {
     \   'line': l:range.lnum,
     \   'echo': 0,
     \   'range': l:range,
     \}
-    " Result includes actual newlines.
-    let l:special_prompt = '\n\n' .
-          \ 'Formatting Rules.\n' .
-          \ 'RETURN ONLY COMPLETE CODE THAT WOULD DIRECTLY REPLACE THE CODE IN THE GIVEN BLOCK.' .
-          \ 'DO NOT PROVIDE ANY EXPLANATIONS BEFORE OR AFTER - JUST CODE!' .
-          \ 'THE OUTPUT SHOULD BE ASSUMED TO BE IN JUST ONE FILE' .
-          \ 'DO NOT ADD ANY MARKDOWN CODE BLOCKS.'
 
-    let l:input = a:prompt . '\n```' . join(l:range.selection, "\n") . '\n```' . l:special_prompt
-    call neural#Run(l:input, l:options)
+    let l:pre_prompt = '# Formatting Rules.\n' .
+          \ '- RETURN ONLY CODE THAT WOULD DIRECTLY REPLACE THE CODE IN THE CODE BLOCK.\n' .
+          \ '- ONLY provide CODE - DO NOT PROVIDE ANY explansations before or after - JUST CODE!\n' .
+          \ '- THE OUTPUT SHOULD BE ASSUMED TO BE IN JUST ONE FILE\n' .
+          \ '- DO NOT ADD ANY MARKDOWN CODE BLOCKS - assume the output is directly into a code file.\n' .
+          \ '---\n'
+
+    let l:prompt = l:pre_prompt .
+          \ 'Given Code:\n\n' .
+          \ join(l:range.selection, "\n") . '\n\n' .
+          \ 'User Prompt:\n' . a:prompt . "\n\n" .
+          \ 'Code Output:\n'
+    " let l:prompt = a:prompt . '\n```' . join(l:range.selection, "\n") . '\n```' . l:special_prompt
+    call neural#Run(l:prompt, l:options)
 endfunction
 
 " Print the prompt that Neural will use in full.

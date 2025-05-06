@@ -40,8 +40,13 @@ function! neural#OutputErrorMessage(message) abort
 
         try
             for l:line in l:lines
-                " no-custom-checks
-                echomsg l:line
+                if has('nvim')
+                    " no-custom-checks
+                    echoerr l:line
+                else
+                    " no-custom-checks
+                    echomsg l:line
+                endif
             endfor
         finally
             " no-custom-checks

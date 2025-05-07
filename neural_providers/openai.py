@@ -9,7 +9,7 @@ import urllib.error
 import urllib.request
 from typing import Any, Dict
 
-API_ENDPOINT = 'https://api.openai.com/v1/completions'
+API_ENDPOINT = 'https://api.openai.com/v1/chat/completions'
 
 OPENAI_DATA_HEADER = 'data: '
 OPENAI_DONE = '[DONE]'

@@ -68,6 +68,8 @@ def test_load_config_errors():
 
 def test_load_config_valid_values():
     raw = get_valid_config()
+    raw["presence_penalty"] = 0.5
+    raw["frequency_penalty"] = 1.0  
     cfg = openai.load_config(raw)
 
     assert cfg.api_key == raw["api_key"]

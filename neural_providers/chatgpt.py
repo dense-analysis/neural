@@ -152,7 +152,7 @@ def load_config(raw_config: Dict[str, Any]) -> Config:
         top_p=top_p,
         max_tokens=max_tokens,
         presence_penalty=presence_penalty,
-        frequency_penalty=presence_penalty,
+        frequency_penalty=frequency_penalty,
     )
 
 

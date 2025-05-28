@@ -66,6 +66,21 @@ def test_load_config_errors():
         assert str(exc.value) == expected_error, config
 
 
+def test_load_config_valid_values():
+    raw = get_valid_config()
+    raw["presence_penalty"] = 0.5
+    raw["frequency_penalty"] = 1.0  
+    cfg = openai.load_config(raw)
+
+    assert cfg.api_key == raw["api_key"]
+    assert cfg.model == raw["model"]
+    assert cfg.temperature == raw["temperature"]
+    assert cfg.top_p == raw["top_p"]
+    assert cfg.max_tokens == raw["max_tokens"]
+    assert cfg.presence_penalty == raw["presence_penalty"]
+    assert cfg.frequency_penalty == raw["frequency_penalty"]
+
+
 def test_main_function_rate_other_error():
     with mock.patch.object(sys.stdin, 'readline') as readline_mock, \
         mock.patch.object(openai, 'get_openai_completion') as completion_mock:

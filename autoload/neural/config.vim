@@ -41,6 +41,13 @@ let s:defaults = {
 \           'temperature': 0.2,
 \           'top_p': 1,
 \       },
+\       'anthropic': {
+\           'api_key': '',
+\           'max_tokens': 1024,
+\           'model': 'claude-2',
+\           'temperature': 0.2,
+\           'top_p': 1,
+\       },
 \   },
 \}
 

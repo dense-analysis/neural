@@ -1,0 +1,8 @@
+Execute(The Anthropic source Dictionary should be correct):
+  AssertEqual
+  \ {
+  \   'name': 'anthropic',
+  \   'script_language': 'python',
+  \   'script': neural#GetScriptDir() . '/anthropic.py'
+  \ },
+  \ neural#source#anthropic#Get()

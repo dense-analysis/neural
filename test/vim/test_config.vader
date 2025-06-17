@@ -66,6 +66,19 @@ Execute(The default chatgpt settings should be correct):
   \ },
   \ get(g:neural.source, 'chatgpt')
 
+Execute(The default anthropic settings should be correct):
+  call neural#config#Load()
+
+  AssertEqual
+  \ {
+  \   'api_key': '',
+  \   'max_tokens': 1024,
+  \   'model': 'claude-2',
+  \   'temperature': 0.2,
+  \   'top_p': 1,
+  \ },
+  \ get(g:neural.source, 'anthropic')
+
 Execute(The default neural buffer settings should be correct):
   call neural#config#Load()
   " call filter(g:neural.buffer, {key -> key =~ 'completion'})

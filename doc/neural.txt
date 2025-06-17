@@ -12,7 +12,8 @@ CONTENTS                                                      *neural-contents*
     4.2 Neural Buffer ............................. |neural-buffer|
     4.3 OpenAI .................................... |neural-openai|
     4.4 ChatGPT ................................... |neural-chatgpt|
-    4.5 Highlights ................................ |neural-highlights|
+    4.5 Anthropic Claude .......................... |neural-anthropic|
+    4.6 Highlights ................................ |neural-highlights|
   5. API ........................................ |neural-api|
   6. Environment Variables ...................... |neural-env|
     6.1 Linux + KDE ............................. |neural-env-kde|
@@ -33,6 +34,7 @@ generate text, code, and much more.
 Neural supports the following tools.
 
 1. OpenAI - https://beta.openai.com/signup/
+2. Anthropic Claude - https://www.anthropic.com/
 
 To select the tool that Neural will use, set |g:neural.selected| to the
 appropriate value. OpenAI is the default data source.
@@ -160,6 +162,7 @@ g:neural.selected                                           *g:neural.selected*
 
   1. `'openai'` - OpenAI
   2. `'chatgpt'` - ChatGPT
+  3. `'anthropic'` - Anthropic Claude
 
 
 g:neural.set_default_keybinds                   *g:neural.set_default_keybinds*
@@ -419,7 +422,53 @@ g:neural.source.chatgpt.top_p                   *g:neural.source.chatgpt.top_p*
 
 
 -------------------------------------------------------------------------------
-4.5 Highlights                                              *neural-highlights*
+4.5 Anthropic Claude                                        *neural-anthropic*
+
+Options for configuring Anthropic Claude are listed below.
+
+
+g:neural.source.anthropic.api_key         *g:neural.source.anthropic.api_key*
+                                      *vim.g.neural.source.anthropic.api_key*
+  Type: |String|
+  Default: `''`
+
+  The Anthropic API key. See: https://www.anthropic.com/
+
+
+g:neural.source.anthropic.max_tokens   *g:neural.source.anthropic.max_tokens*
+                                  *vim.g.neural.source.anthropic.max_tokens*
+  Type: |Number|
+  Default: `1024`
+
+  The maximum number of tokens to generate in the output.
+
+
+g:neural.source.anthropic.model             *g:neural.source.anthropic.model*
+                                        *vim.g.neural.source.anthropic.model*
+  Type: |String|
+  Default: `'claude-2'`
+
+  The model to use for Anthropic Claude.
+
+
+g:neural.source.anthropic.temperature *g:neural.source.anthropic.temperature*
+                                  *vim.g.neural.source.anthropic.temperature*
+  Type: |Number| or |Float|
+  Default: `0.2`
+
+  The Anthropic sampling temperature.
+
+
+g:neural.source.anthropic.top_p             *g:neural.source.anthropic.top_p*
+                                        *vim.g.neural.source.anthropic.top_p*
+  Type: |Number| or |Float|
+  Default: `1`
+
+  The Anthropic nucleus sampling between `0` and `1`.
+
+
+-------------------------------------------------------------------------------
+4.6 Highlights                                              *neural-highlights*
 
 The following highlights can be configured to change |neural|'s colors.
 

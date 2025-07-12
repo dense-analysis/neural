@@ -99,7 +99,7 @@ Execute(Running Neural and collecting output should work):
   \     'neural#job#SendRaw',
   \     1,
   \     json_encode({
-  \       'config': g:neural.source[g:neural.selected],
+  \       'config': g:neural.providers[0],
   \       'prompt': 'this is a test',
   \     }) . "\n",
   \   ],

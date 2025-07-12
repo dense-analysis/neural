@@ -8,11 +8,6 @@ After:
 
   Restore
 
-Execute(The default selection should be correct):
-  call neural#config#Load()
-
-  AssertEqual 'openai', get(g:neural, 'selected')
-
 Execute(The default keybind setting should be correct):
   call neural#config#Load()
 
@@ -37,34 +32,24 @@ Execute(The default echo settings should be correct):
   AssertEqual {'echo_enabled': v:true}, g:neural.ui
 
 Execute(The default openai settings should be correct):
+  let g:neural = {'providers': [{'type': 'openai'}]}
+
   call neural#config#Load()
 
   AssertEqual
-  \ {
+  \ [{
+  \   'type': 'openai',
+  \   'url': 'https://api.openai.com',
   \   'api_key': '',
   \   'frequency_penalty': 0.1,
   \   'max_tokens': 1024,
   \   'model': 'gpt-3.5-turbo-instruct',
+  \   'use_chat_api': v:false,
   \   'presence_penalty': 0.1,
   \   'temperature': 0.2,
   \   'top_p': 1,
-  \ },
-  \ get(g:neural.source, 'openai')
-
-Execute(The default chatgpt settings should be correct):
-  call neural#config#Load()
-
-  AssertEqual
-  \ {
-  \   'api_key': '',
-  \   'frequency_penalty': 0.1,
-  \   'max_tokens': 2048,
-  \   'model': 'gpt-3.5-turbo',
-  \   'presence_penalty': 0.1,
-  \   'temperature': 0.2,
-  \   'top_p': 1,
-  \ },
-  \ get(g:neural.source, 'chatgpt')
+  \ }],
+  \ get(g:neural, 'providers')
 
 Execute(The default neural buffer settings should be correct):
   call neural#config#Load()
@@ -85,9 +70,9 @@ Execute(Settings should be merged correctly):
       " Try the method of setting g:neural the first time.
       let g:neural = {
       \ 'ui': {'echo_enabled': v:true},
-      \ 'source': {
-      \   'openai': {'api_key': 'mykey'},
-      \ },
+      \ 'providers': [
+      \   {'type': 'openai', 'api_key': 'mykey'},
+      \ ],
       \}
     else
       " Try calling Set with no global like Lua will the second time.
@@ -96,17 +81,24 @@ Execute(Settings should be merged correctly):
 
     " The results should be the same in each case.
     call neural#config#Load()
-    call filter(g:neural, {key -> key =~ '\v^ui$|^source$'})
+    call filter(g:neural, {key -> key =~ '\v^ui$|^providers$'})
     call filter(g:neural.ui, {key -> key is# 'echo_enabled'})
-    call filter(g:neural.source, {key -> key is# 'openai'})
-    call filter(g:neural.source.openai, {key -> key is# 'api_key'})
 
     AssertEqual
     \ {
     \   'ui': {'echo_enabled': v:true},
-    \   'source': {
-    \     'openai': {'api_key': 'mykey'},
-    \   },
+    \   'providers': [{
+    \     'type': 'openai',
+    \     'url': 'https://api.openai.com',
+    \     'api_key': 'mykey',
+    \     'frequency_penalty': 0.1,
+    \     'max_tokens': 1024,
+    \     'model': 'gpt-3.5-turbo-instruct',
+    \     'use_chat_api': v:false,
+    \     'presence_penalty': 0.1,
+    \     'temperature': 0.2,
+    \     'top_p': 1,
+    \   }],
     \ },
     \ g:neural
   endfor
@@ -122,18 +114,64 @@ Execute(Settings should load quickly after the first merge):
 
 Execute(Settings should update when g:neural is changed):
   call neural#config#Load()
+  let g:neural = {'providers': [{'type': 'openai', 'api_key': 'mykey'}]}
+  call neural#config#Load()
+
+  AssertEqual 1, len(g:neural.providers)
+  AssertEqual 'mykey', g:neural.providers[0].api_key
+  AssertEqual 0.2, g:neural.providers[0].temperature
+
+Execute(Settings migrated from an old configuration with a default selection should work):
   let g:neural = {'source': {'openai': {'api_key': 'mykey'}}}
   call neural#config#Load()
 
-  AssertEqual 'mykey', g:neural.source.openai.api_key
-  AssertEqual 0.2, g:neural.source.openai.temperature
+  call map(g:neural.providers, {_, val -> filter(val, {key -> key =~ '\v^api_key$|^type|use_chat_api$'})})
+  AssertEqual
+  \ [{'type': 'openai', 'api_key': 'mykey', 'use_chat_api': v:false}],
+  \ g:neural.providers
+  Assert !has_key(g:neural, 'selected')
+  Assert !has_key(g:neural, 'source')
 
-Execute(The chatgpt api_key should default to the openai api_key):
-  call neural#config#Set({
-  \ 'ui': {'echo_enabled': v:true},
+Execute(Settings migrated from an old configuration with an openai selection should work):
+  let g:neural = {
+  \ 'source': {
+  \   'openai': {'api_key': 'mykey'},
+  \   'chatgpt': {'api_key': 'otherkey'}
+  \ },
+  \ 'selected': 'openai'
+  \}
+  call neural#config#Load()
+
+  call map(g:neural.providers, {_, val -> filter(val, {key -> key =~ '\v^api_key$|^type|use_chat_api$'})})
+  AssertEqual
+  \ [{'type': 'openai', 'api_key': 'mykey', 'use_chat_api': v:false}],
+  \ g:neural.providers
+  Assert !has_key(g:neural, 'selected')
+  Assert !has_key(g:neural, 'source')
+
+Execute(Settings migrated from an old configuration with chatgpt should work):
+  let g:neural = {'source': {'chatgpt': {'api_key': 'mykey'}}, 'selected': 'chatgpt'}
+  call neural#config#Load()
+
+  call map(g:neural.providers, {_, val -> filter(val, {key -> key =~ '\v^api_key$|^type|use_chat_api$'})})
+  AssertEqual
+  \ [{'type': 'chatgpt', 'api_key': 'mykey', 'use_chat_api': v:true}],
+  \ g:neural.providers
+  Assert !has_key(g:neural, 'selected')
+  Assert !has_key(g:neural, 'source')
+
+Execute(Settings migrated from an old configuration with chatgpt and the key set once for openai should work):
+  let g:neural = {
   \ 'source': {
   \   'openai': {'api_key': 'mykey'},
   \ },
-  \})
+  \ 'selected': 'chatgpt'
+  \}
+  call neural#config#Load()
 
-  AssertEqual 'mykey', g:neural.source.chatgpt.api_key
+  call map(g:neural.providers, {_, val -> filter(val, {key -> key =~ '\v^api_key$|^type|use_chat_api$'})})
+  AssertEqual
+  \ [{'type': 'chatgpt', 'api_key': 'mykey', 'use_chat_api': v:true}],
+  \ g:neural.providers
+  Assert !has_key(g:neural, 'selected')
+  Assert !has_key(g:neural, 'source')

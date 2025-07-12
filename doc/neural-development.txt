@@ -124,21 +124,18 @@ Apply the following rules when writing Bash scripts.
 ===============================================================================
 4. Development Environment                     *neural-development-environment*
 
-You can run `tox` without Docker if you install the required Python versions.
-Neural tests against Python 3.7 and Python 3.10.
-
 Run the following: >
-  python -m pip install --user tox==4.4.5
-  python -m tox
+  pyenv install
+  pip install uv
+  uv sync
 <
-To get the same configuration in your editor, run `./install-python-env.sh`.
-ALE should pick up on how to run `flake8` and `pyright` automatically, but you
-may wish to configure ALE to run only those linters. You can configure ALE
-to fix the Python files with `isort`. Apply the following settings: >
+This should install all Python dependencies for development including
+`pyright`, `ruff`, etc. You may wish to configure ALE to run only the linters
+and fixers for the project. You can configure ALE like so: >
 
   if expand('%:p') =~# 'neural'
-    let b:ale_linters = ['flake8', 'pyright']
-    let b:ale_fixers = ['isort']
+    let b:ale_linters = ['ruff', 'pyright']
+    let b:ale_fixers = ['ruff']
   endif
 <
 

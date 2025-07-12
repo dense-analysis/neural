@@ -1,9 +1,12 @@
 .coverage
 .directory
 .tox
+*.pyc
 .tox-docker
 /env
 __pycache__
 tags
 # pyenv
 .python-version
+*.pyc
+*.egg-info

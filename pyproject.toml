@@ -1,0 +1,96 @@
+# This enables: `pip install -e .`
+[tool.setuptools]
+# map the “root” package directory to src/
+package-dir = { "" = "src" }
+# turn on automatic package discovery
+packages = { find = { where = ["src"], include = ["*"] } }
+
+[build-system]
+# NOTE: We should *not* add "wheel" here!
+# See: https://www.reddit.com/r/Python/comments/1jwbymm/psa_you_should_remove_wheel_from_your/
+requires = ["setuptools ~=77.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neural"
+version = "0.2.0"
+description = "A coding agent"
+authors = [
+    {name = "Georgi Angelchev", email = "george@denseanalysis.org"},
+    {name = "Andrew Wray", email = "andrew@denseanalysis.org"},
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+# Core dependencies -> NONE
+dependencies = [
+]
+
+[dependency-groups]
+dev = [
+    "pyright==1.1.402",
+    "pytest>=8.4.1",
+    "ruff==0.10.0",
+    "vim-vint===0.3.21",
+]
+
+[tool.pyright]
+venvPath = "./"
+venv = ".venv"
+pythonVersion = "3.10"
+extraPaths = ["src"]
+reportMissingImports = true
+reportMissingModuleSource = "error"
+typeCheckingMode = "strict"
+
+# Settings for ruff
+[tool.ruff]
+line-length = 79
+target-version = "py310"
+
+# Include all default rules from the ruff "all" baseline, but we'll fine-tune.
+lint.select = [
+    "E",     # PEP8 errors                (confirms with PEP8)
+    "W",     # PEP8 warnings              (confirms with PEP8)
+    "I",     # isort                      (sorts imports)
+    "B",     # flake8-bugbear rules       (catches mulable by mistake and more)
+    "A",     # flake8-builtins            (stop accidental shadowing)
+    "COM",   # flake8-commas              (no accidental tuples and more)
+    "ASYNC", # flake8-async rules         (fixes async issues)
+    "FBT",   # flake8-boolean-trap rules  (stops the Boolean Trap)
+    "F",     # Pyflakes                   (fixes common mistakes)
+    "FAST",  # FastAPI rules              (fixes FastAPI misusage)
+    "RUF",   # ruff-specific rules        (fixes common bugs)
+    "UP",    # pyupgrade                  (modernises code)
+    "C90",   # mccabe                     (no overly-complex code)
+]
+
+[tool.ruff.lint.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 20
+# This is 20 possible branches through code in a single function.
+# See also: https://ntrs.nasa.gov/api/citations/20205011566/downloads/20205011566.pdf
+max-complexity = 20
+
+# ruff isort settings
+[tool.ruff.lint.isort]
+# Black-compatible isort settings for ruff
+combine-as-imports = true
+force-wrap-aliases = true
+split-on-trailing-comma = true
+
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+# You can keep third party libraries grouped together by adding them here.
+# known-third-party = []
+
+# pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "--strict-markers --tb=short"
+testpaths = ["test/python"]
+python_files = ["test_*.py"]
+markers = [
+  "slow: mark slow tests",
+  "integration: mark integration tests",
+  "allow_network: allow network connections for this test",
+  "unit: mark unit tests",
+]

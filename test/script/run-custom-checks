@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+set -eu
+
+docker_flags=(--rm -w /testplugin -v "$PWD/test:/home")
+# Mount most directories, but definitely not .venv!
+for filename in *; do
+    if \
+        [ "$filename" != run-tests ] \
+        && [ "$filename" != Dockerfile ] \
+        && [[ "$filename" != *.md ]] \
+    ;then
+        docker_flags+=("-v" "$PWD/$filename:/testplugin/$filename")
+    fi
+done
+docker_flags+=("$DOCKER_RUN_IMAGE")
+# Use our compiled and installed Python executables,
+# and include the regular paths in PATH.
+docker_flags+=(env PATH='/root/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin')
+
+exit_code=0
+
+set -o pipefail
+
+echo '========================================'
+echo 'Running custom linting rules'
+echo '========================================'
+echo 'Custom warnings/errors follow:'
+echo
+
+docker run "${docker_flags[@]}" test/script/custom-linting-rules . || exit_code=$?
+
+echo
+echo '========================================'
+echo 'Checking for duplicate tags'
+echo '========================================'
+echo 'Duplicate tags follow:'
+echo
+
+docker run "${docker_flags[@]}" test/script/check-duplicate-tags . || exit_code=$?
+
+echo
+echo '========================================'
+echo 'Checking for invalid tag references'
+echo '========================================'
+echo 'Invalid tag references tags follow:'
+echo
+
+docker run "${docker_flags[@]}" test/script/check-tag-references || exit_code=$?
+
+echo '========================================'
+echo 'Look for badly aligned doc tags'
+echo '========================================'
+echo 'Badly aligned tags follow:'
+echo
+
+docker run "${docker_flags[@]}" test/script/check-tag-alignment || exit_code=$?
+
+exit $exit_code

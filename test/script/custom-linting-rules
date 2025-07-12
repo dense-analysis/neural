@@ -154,21 +154,8 @@ check_errors '\(!=.\?\|isnot\) type(\[\])' "Use 'isnot v:t_list' instead"
 check_errors '\(!=.\?\|isnot\) type({})' "Use 'isnot v:t_dict' instead"
 check_errors '\(!=.\?\|isnot\) type(function([^)]\+))' "Use 'isnot v:t_func' instead"
 
-# Run a Python script to find lines that require padding around them.  For
-# users without Python installed, we'll skip these checks. GitHub Actions will
-# run the script.
-python=''
-
-if command -v python3.10 > /dev/null; then
-    python=python3.10
-elif command -v python > /dev/null; then
-    python=python
-fi
-
-if [ -n "$python" ]; then
-    if ! "$python" test/script/block-padding-checker "$directory"/**/*.vim; then
-        exit_code=1
-    fi
+if ! test/script/block-padding-checker "$directory"/**/*.vim; then
+    exit_code=1
 fi
 
 exit $exit_code

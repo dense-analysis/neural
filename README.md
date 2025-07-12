@@ -2,7 +2,9 @@
 
 [![Vim](https://img.shields.io/badge/VIM-%2311AB00.svg?style=for-the-badge&logo=vim&logoColor=white)](https://www.vim.org/) [![Neovim](https://img.shields.io/badge/NeoVim-%2357A143.svg?&style=for-the-badge&logo=neovim&logoColor=white)](https://neovim.io/) [![CI](https://img.shields.io/github/actions/workflow/status/dense-analysis/neural/main.yml?branch=main&label=CI&logo=github&style=for-the-badge)](https://github.com/dense-analysis/neural/actions?query=event%3Apush+workflow%3ACI+branch%3Amain++) [![Join the Dense Analysis Discord server](https://img.shields.io/badge/chat-Discord-5865F2?style=for-the-badge&logo=appveyor)](https://discord.gg/5zFD6pQxDk)
 
-A ChatGPT Vim plugin, an OpenAI Neovim plugin, and so much more! Neural integrates various machine learning tools so you can let AI write code for you in Vim/Neovim, among other helpful things.
+A Neovim/Vim coding agent plugin. Neural integrates various machine learning
+tools so you can let AI write code for you in Neovim/Vim, among other helpful
+things. Use OpenAI's APIs made famous with ChatGPT, in Vim.
 
 ## 🌟 Features
 
@@ -12,7 +14,7 @@ A ChatGPT Vim plugin, an OpenAI Neovim plugin, and so much more! Neural integrat
 * Easily ask AI to explain code or paragraphs `:NeuralExplain`
 * Compatible with Vim 8.0+ & Neovim 0.8+
 * Supported on Linux, Mac OSX, and Windows
-* Only dependency is Python 3.7+
+* Only dependency is Python 3.10+ (required for security and libraries)
 
 Experience lightning-fast code generation and completion with asynchronous
 streaming.
@@ -76,7 +78,7 @@ Plugin 'dense-analysis/neural'
 ## 🚀 Usage
 
 You will need to configure a third party machine learning tool for Neural to
-interact with. OpenAI is Neural's default data source, and one of the easiest
+interact with. OpenAI is Neural's default data provider, and one of the easiest
 to configure.
 
 You will need to obtain an [OpenAI API key](https://beta.openai.com/signup/).
@@ -86,20 +88,24 @@ script or in a Lua config.
 ```vim
 " Configure Neural like so in Vimscript
 let g:neural = {
-\   'source': {
-\       'openai': {
-\           'api_key': $OPENAI_API_KEY,
+\   'providers': [
+\       {
+\           'openai': {
+\               'api_key': $OPENAI_API_KEY,
+\           },
 \       },
-\   },
+\   ],
 \}
 ```
 
 ```lua
 -- Configure Neural like so in Lua
 require('neural').setup({
-    source = {
-        openai = {
-            api_key = vim.env.OPENAI_API_KEY,
+    providers = {
+        {
+            openai = {
+                api_key = vim.env.OPENAI_API_KEY,
+            },
         },
     },
 })
@@ -128,6 +134,22 @@ another keybind for `<C-c>` (CTRL+C) is defined in normal mode, Neural will run
 the stop command by default when you enter that key combination. The default
 keybind can be disabled by setting `g:neural.set_default_keybinds` to any falsy
 value. You can set a keybind to stop Neural by mapping to `<Plug>(neural_stop)`.
+
+## 🛠️ Development
+
+To get started developing Neural, you will need to run the following commands,
+after first installing and correctly configuring
+[pyenv](https://github.com/pyenv/pyenv).
+
+```sh
+pyenv install
+pip install uv
+uv sync
+```
+
+You should then get all of the linters and static analysis tools, and you can
+run tests with `pytest` from virtualenv. We recommend using
+[ALE](https://github.com/dense-analysis/ale) to run linters for this project.
 
 ## 📜 Acknowledgements
 

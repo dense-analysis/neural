@@ -11,8 +11,7 @@ CONTENTS                                                      *neural-contents*
     4.1 UI ........................................ |neural-ui|
     4.2 Neural Buffer ............................. |neural-buffer|
     4.3 OpenAI .................................... |neural-openai|
-    4.4 ChatGPT ................................... |neural-chatgpt|
-    4.5 Highlights ................................ |neural-highlights|
+    4.4 Highlights ................................ |neural-highlights|
   5. API ........................................ |neural-api|
   6. Environment Variables ...................... |neural-env|
     6.1 Linux + KDE ............................. |neural-env-kde|
@@ -32,10 +31,11 @@ generate text, code, and much more.
 
 Neural supports the following tools.
 
-1. OpenAI - https://beta.openai.com/signup/
+1. OpenAI - https://platform.openai.com/signup
+2. Any model that uses the OpenAI API. See |neural-provider-openai.url|
 
-To select the tool that Neural will use, set |g:neural.selected| to the
-appropriate value. OpenAI is the default data source.
+To select the tool that Neural will use, set |g:neural.providers| to the
+appropriate value. OpenAI is the default data provider.
 
 ===============================================================================
 3. Commands/Keybinds                                          *neural-commands*
@@ -71,7 +71,7 @@ appropriate value. OpenAI is the default data source.
 `:NeuralCompletion`                                          *NeuralCompletion*
 
   A command for a |NeuralBuffer| (`neuralbuf` filetype) that sends all buffer
-  contents to the current neural source for completion and appends the
+  contents to the current neural provider for completion and appends the
   response to the buffer.
 
   A `neuralbuf` plug mapping `<Plug>(neural_completion)` is defined for this
@@ -81,8 +81,8 @@ appropriate value. OpenAI is the default data source.
 `:NeuralExplain`                                                *NeuralExplain*
 
   A |visual-mode| command for explaining the highlighted lines. The visual
-  selection will be sent to the currently selected source model and the
-  response will be displayed in a preview window.
+  selection will be sent to the currently selected provider and the response
+  will be displayed in a preview window.
 
   Neural will make basic attempts to redact lines that appear to contain
   passwords or secrets.
@@ -124,11 +124,13 @@ configured either in Vim or in Lua.
 In Vim just set `g:neural`: >
 
   let g:neural = {
-  \   'source': {
-  \       'openai': {
-  \           'api_key': $OPENAI_API_KEY,
+  \   'providers': [
+  \       {
+  \           'openai': {
+  \               'api_key': $OPENAI_API_KEY,
+  \           },
   \       },
-  \   },
+  \   ],
   \}
 <
 In a Neovim `init.lua` call `require('neural').setup`: >
@@ -137,10 +139,12 @@ In a Neovim `init.lua` call `require('neural').setup`: >
       ui = {
           animated_sign_enabled = false,
       },
-      source = {
-          openai = {
-              api_key = vim.env.OPENAI_API_KEY,
-          },
+      providers = {
+          {
+              openai = {
+                  api_key = vim.env.OPENAI_API_KEY,
+              },
+          }
       },
   })
 <
@@ -150,16 +154,6 @@ Neural will react to the change in settings. A complete list of supported
 options listed below.
 
 -------------------------------------------------------------------------------
-
-g:neural.selected                                           *g:neural.selected*
-                                                        *vim.g.neural.selected*
-  Type: |String|
-  Default: `'openai'`
-
-  Selects a source for Neural to use. Possible values are:
-
-  1. `'openai'` - OpenAI
-  2. `'chatgpt'` - ChatGPT
 
 
 g:neural.set_default_keybinds                   *g:neural.set_default_keybinds*
@@ -182,6 +176,16 @@ g:neural.pre_process.enabled                     *g:neural.pre_process.enabled*
 
   Neural edits the text you send automatically by default to improve the
   quality of prompts to produce better results for each filetype.
+
+g:neural.providers                                         *g:neural.providres*
+                                                       *vim.g.neural.providers*
+  Type: |List|
+  Default: `[]`
+
+  The List of providers to configure which providers Neural will use.
+
+  NOTE: At the moment Neural will only ever use the first provider, and
+  ignore the rest. If unspecified, OpenAI will be used by default.
 
 
 -------------------------------------------------------------------------------
@@ -266,20 +270,20 @@ g:neural.buffer.wrap                                     *g:neural.buffer.wrap*
 -------------------------------------------------------------------------------
 4.3 OpenAI                                                      *neural-openai*
 
-Options for configuring OpenAI are listed below.
+Options for configuring OpenAI are listed below. This settings should be set
+as an Dictionary/table in the `providers` List with `type` set to `'openai'`.
 
 
-g:neural.source.openai.api_key                 *g:neural.source.openai.api_key*
-                                           *vim.g.neural.source.openai.api_key*
+api_key                                        *neural-provider-openai.api_key*
+
   Type: |String|
   Default: `''`
 
   The OpenAI API key. See: https://beta.openai.com/signup/
 
 
-g:neural.source.openai.frequency_penalty
-                                     *g:neural.source.openai.frequency_penalty*
-                                 *vim.g.neural.source.openai.frequency_penalty*
+frequency_penalty
+                                     *neural-provider-openai.frequency_penalty*
   Type: |Number| or |Float|
   Default: `0.1`
 
@@ -290,8 +294,8 @@ g:neural.source.openai.frequency_penalty
   See: https://platform.openai.com/docs/api-reference/parameter-details
 
 
-g:neural.source.openai.max_tokens           *g:neural.source.openai.max_tokens*
-                                        *vim.g.neural.source.openai.max_tokens*
+max_tokens                                  *neural-provider-openai.max_tokens*
+
   Type: |Number|
   Default: `1024`
 
@@ -301,18 +305,20 @@ g:neural.source.openai.max_tokens           *g:neural.source.openai.max_tokens*
   This translates to roughly `¾` of a word (e.g. `100 tokens ~= 75 words`).
 
 
-g:neural.source.openai.model                     *g:neural.source.openai.model*
-                                             *vim.g.neural.source.openai.model*
+model                                            *neural-provider-openai.model*
+
   Type: |String|
   Default: `'gpt-3.5-turbo-instruct'`
 
   The model to use for OpenAI. Please consult OpenAI's documentation for more
   information on models: https://platform.openai.com/docs/models/overview
 
+  See |neural-provider-openai.use_chat_api| if changing models, as you may
+  need to use the chat API only for newer models.
 
-g:neural.source.openai.presence_penalty
-                                      *g:neural.source.openai.presence_penalty*
-                                  *vim.g.neural.source.openai.presence_penalty*
+
+presence_penalty
+                                      *neural-provider-openai.presence_penalty*
   Type: |Number| or |Float|
   Default: `0.1`
 
@@ -324,8 +330,8 @@ g:neural.source.openai.presence_penalty
   See: https://platform.openai.com/docs/api-reference/parameter-details
 
 
-g:neural.source.openai.temperature         *g:neural.source.openai.temperature*
-                                       *vim.g.neural.source.openai.temperature*
+temperature                                *neural-provider-openai.temperature*
+
   Type: |Number| or |Float|
   Default: `0.2`
 
@@ -335,8 +341,8 @@ g:neural.source.openai.temperature         *g:neural.source.openai.temperature*
   like `0.2` will make it more focused and deterministic.
 
 
-g:neural.source.openai.top_p                     *g:neural.source.openai.top_p*
-                                             *vim.g.neural.source.openai.top_p*
+top_p                                            *neural-provider-openai.top_p*
+
   Type: |Number| or |Float|
   Default: `1`
 
@@ -351,75 +357,18 @@ g:neural.source.openai.top_p                     *g:neural.source.openai.top_p*
   OpenAI recommends altering this or temperature but not both.
 
 
--------------------------------------------------------------------------------
-4.4 ChatGPT                                                    *neural-chatgpt*
+use_chat_api                              *neural-provider-openai.use_chat_api*
+  Type: |Boolean|
+  Default: `true`
 
-Options for configuring ChatGPT are listed below.
-
-Many options are simliar to OpenAI completion options above.
-
-
-g:neural.source.chatgpt.api_key               *g:neural.source.chatgpt.api_key*
-                                          *vim.g.neural.source.chatgpt.api_key*
-  Type: |String|
-  Default: `''`
-
-  The OpenAI API key. See: https://beta.openai.com/signup/
-
-
-g:neural.source.chatgpt.frequency_penalty
-                                    *g:neural.source.chatgpt.frequency_penalty*
-                                *vim.g.neural.source.chatgpt.frequency_penalty*
-  Type: |Number| or |Float|
-  Default: `0.1`
-
-  See Also: |g:neural.source.openai.frequency_penalty|
-
-
-g:neural.source.chatgpt.max_tokens         *g:neural.source.chatgpt.max_tokens*
-                                       *vim.g.neural.source.chatgpt.max_tokens*
-  Type: |Number|
-  Default: `2048`
-
-  See Also: |g:neural.source.openai.max_tokens|
-
-
-g:neural.source.chatgpt.model                   *g:neural.source.chatgpt.model*
-                                            *vim.g.neural.source.chatgpt.model*
-  Type: |String|
-  Default: `'gpt-3.5-turbo'`
-
-  The model to use for ChatGPT. Please consult OpenAI's documentation for more
-  information on models: https://platform.openai.com/docs/models/overview
-
-
-g:neural.source.chatgpt.presence_penalty
-                                     *g:neural.source.chatgpt.presence_penalty*
-                                 *vim.g.neural.source.chatgpt.presence_penalty*
-  Type: |Number| or |Float|
-  Default: `0.1`
-
-  See Also: |g:neural.source.openai.presence_penalty|
-
-
-g:neural.source.chatgpt.temperature       *g:neural.source.chatgpt.temperature*
-                                      *vim.g.neural.source.chatgpt.temperature*
-  Type: |Number| or |Float|
-  Default: `0.2`
-
-  See Also: |g:neural.source.openai.temperature|
-
-
-g:neural.source.chatgpt.top_p                   *g:neural.source.chatgpt.top_p*
-                                            *vim.g.neural.source.chatgpt.top_p*
-  Type: |Number| or |Float|
-  Default: `1`
-
-  See Also: |g:neural.source.openai.top_p|
+  For configuring if Neural should use `/v1/chat/completions` if `true`, or
+  the `/v1/completions` API if `false`. Older models such as
+  `'gpt-3.5-turbo-instruct'` will only run with the completions API, and
+  newer models may only run with the chat API.
 
 
 -------------------------------------------------------------------------------
-4.5 Highlights                                              *neural-highlights*
+4.4 Highlights                                              *neural-highlights*
 
 The following highlights can be configured to change |neural|'s colors.
 
@@ -483,11 +432,13 @@ out and in again, you will be able to access your environment variables in any
 Vim or GUI Vim startup script you like uniformly, like so: >
 
   let g:neural = {
-  \   'source': {
-  \       'openai': {
-  \           'api_key': $OPENAI_API_KEY,
+  \   'providers': [
+  \       {
+  \           'openai': {
+  \               'api_key': $OPENAI_API_KEY,
+  \           },
   \       },
-  \   },
+  \   ],
   \}
 <
 All applications on your system will also be able to read the same environment

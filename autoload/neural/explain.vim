@@ -52,7 +52,7 @@ function! neural#explain#SelectedLines() abort
     let l:range = neural#visual#GetRange()
     let l:buffer = bufnr('')
 
-    let [l:source, l:command] = neural#GetCommand(l:buffer)
+    let [l:provider, l:command] = neural#GetCommand(l:buffer)
 
     let l:job_data = {
     \   'output_lines': [],
@@ -68,20 +68,13 @@ function! neural#explain#SelectedLines() abort
     if l:job_id > 0
         let l:lines = neural#redact#PasswordsAndSecrets(l:range.selection)
 
-        let l:config = get(g:neural.source, l:source.name, {})
-
-        " If the config is not a Dictionary, throw it away.
-        if type(l:config) isnot v:t_dict
-            let l:config = {}
-        endif
-
         let l:input = {
-        \   'config': l:config,
+        \   'config': l:provider.config,
         \   'prompt': "Explain these lines:\n\n" . join(l:lines, "\n"),
         \}
         call neural#job#SendRaw(l:job_id, json_encode(l:input) . "\n")
     else
-        call neural#OutputErrorMessage('Failed to run ' . l:source.name)
+        call neural#OutputErrorMessage('Failed to run ' . l:provider.name)
 
         return
     endif

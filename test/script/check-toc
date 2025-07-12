@@ -58,11 +58,13 @@ section_index=0
 while read -r; do
     if [[ "$REPLY" =~ ^\  ]]; then
         if ! ((in_section)); then
+            # shellcheck disable=SC2219
             let section_index='section_index + 1'
             in_section=1
         fi
     else
         if ((in_section)); then
+            # shellcheck disable=SC2219
             let section_index='section_index + 1'
             in_section=0
         fi

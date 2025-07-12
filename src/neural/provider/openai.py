@@ -1,5 +1,5 @@
 """
-A Neural datasource for loading generated text via OpenAI.
+A Neural provider for GPT conversations.
 """
 import json
 import platform
@@ -7,9 +7,7 @@ import ssl
 import sys
 import urllib.error
 import urllib.request
-from typing import Any, Dict
-
-API_ENDPOINT = 'https://api.openai.com/v1/chat/completions'
+from typing import Any
 
 OPENAI_DATA_HEADER = 'data: '
 OPENAI_DONE = '[DONE]'
@@ -21,16 +19,21 @@ class Config:
     """
     def __init__(
         self,
+        *,
+        url: str,
         api_key: str,
         model: str,
+        use_chat_api: bool,
         temperature: float,
         top_p: float,
         max_tokens: int,
         presence_penalty: float,
         frequency_penalty: float,
     ):
+        self.url = url
         self.api_key = api_key
         self.model = model
+        self.use_chat_api = use_chat_api
         self.temperature = temperature
         self.top_p = top_p
         self.max_tokens = max_tokens
@@ -38,14 +41,16 @@ class Config:
         self.frequency_penalty = frequency_penalty
 
 
-def get_openai_completion(config: Config, prompt: str) -> None:
+def get_openai_completion(
+    config: Config,
+    prompt: str | list[dict[str, str]],
+) -> None:
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {config.api_key}"
+        "Authorization": f"Bearer {config.api_key}",
     }
-    data = {
+    data: dict[str, Any] = {
         "model": config.model,
-        "prompt": prompt,
         "temperature": config.temperature,
         "max_tokens": config.max_tokens,
         "top_p": 1,
@@ -54,13 +59,26 @@ def get_openai_completion(config: Config, prompt: str) -> None:
         "stream": True,
     }
 
+    if config.use_chat_api:
+        data["messages"] = (
+            [{"role": "user", "content": prompt}]
+            if isinstance(prompt, str) else
+            prompt
+        )
+    else:
+        data["prompt"] = prompt
+
     req = urllib.request.Request(
-        API_ENDPOINT,
+        (
+            f'{config.url}/v1/chat/completions'
+            if config.use_chat_api else
+            f'{config.url}/v1/completions'
+        ),
         data=json.dumps(data).encode("utf-8"),
         headers=headers,
         method="POST",
-        unverifiable=True,
     )
+    role: str | None = None
 
     # Disable SSL certificate verification on macOS.
     # This is bad for security, and we need to deal with SSL errors better.
@@ -81,63 +99,101 @@ def get_openai_completion(config: Config, prompt: str) -> None:
                 break
 
             line = line_bytes.decode("utf-8", errors="replace")
+            line_data = (
+                line[len(OPENAI_DATA_HEADER):-1]
+                if line.startswith(OPENAI_DATA_HEADER) else
+                None
+            )
 
-            if line.startswith(OPENAI_DATA_HEADER):
-                line_data = line[len(OPENAI_DATA_HEADER):-1]
+            if line_data and line_data != OPENAI_DONE:
+                openai_obj = json.loads(line_data)
 
-                if line_data == OPENAI_DONE:
-                    pass
+                if config.use_chat_api:
+                    delta = openai_obj["choices"][0]["delta"]
+                    # The role is typically in the first delta only.
+                    role = delta.get("role", role)
+
+                    if role == "assistant" and "content" in delta:
+                        print(delta["content"], end="", flush=True)
                 else:
-                    openai_obj = json.loads(line_data)
-
                     print(openai_obj["choices"][0]["text"], end="", flush=True)
 
     print()
 
 
-def load_config(raw_config: Dict[str, Any]) -> Config:
+def load_config(raw_config: dict[str, Any]) -> Config:
     # TODO: Add range validation for request parameters.
     if not isinstance(raw_config, dict):  # type: ignore
         raise ValueError("openai config is not a dictionary")
 
+    url = raw_config.get('url')
+
+    if url is None:
+        url = 'https://api.openai.com'
+    elif not isinstance(url, str):
+        raise ValueError("url must be a string")
+    elif not url.startswith("http://") and not url.startswith("https://"):
+        raise ValueError("url must start with http(s)://")
+
     api_key = raw_config.get('api_key')
 
     if not isinstance(api_key, str) or not api_key:  # type: ignore
-        raise ValueError("openai.api_key is not defined")
+        raise ValueError("api_key is not defined")
 
     model = raw_config.get('model')
 
     if not isinstance(model, str) or not model:
-        raise ValueError("openai.model is not defined")
+        raise ValueError("model is not defined")
+
+    use_chat_api = raw_config.get('use_chat_api')
+
+    if use_chat_api is None:
+        # Default to the older completions API if using certain older models.
+        use_chat_api = model not in (
+            'ada',
+            'babbage',
+            'curie',
+            'davinci',
+            'gpt-3.5-turbo-instruct',
+            'text-ada-001',
+            'text-babbage-001',
+            'text-curie-001',
+            'text-davinci-002',
+            'text-davinci-003',
+        )
+    elif not isinstance(use_chat_api, bool):
+        raise ValueError("use_chat_api must be true or false")
 
     temperature = raw_config.get('temperature', 0.2)
 
-    if not isinstance(temperature, (int, float)):
-        raise ValueError("openai.temperature is invalid")
+    if not isinstance(temperature, int | float):
+        raise ValueError("temperature is invalid")
 
     top_p = raw_config.get('top_p', 1)
 
-    if not isinstance(top_p, (int, float)):
-        raise ValueError("openai.top_p is invalid")
+    if not isinstance(top_p, int | float):
+        raise ValueError("top_p is invalid")
 
     max_tokens = raw_config.get('max_tokens', 1024)
 
     if not isinstance(max_tokens, (int)):
-        raise ValueError("openai.max_tokens is invalid")
+        raise ValueError("max_tokens is invalid")
 
     presence_penalty = raw_config.get('presence_penalty', 0)
 
-    if not isinstance(presence_penalty, (int, float)):
-        raise ValueError("openai.presence_penalty is invalid")
+    if not isinstance(presence_penalty, int | float):
+        raise ValueError("presence_penalty is invalid")
 
     frequency_penalty = raw_config.get('frequency_penalty', 0)
 
-    if not isinstance(frequency_penalty, (int, float)):
-        raise ValueError("openai.frequency_penalty is invalid")
+    if not isinstance(frequency_penalty, int | float):
+        raise ValueError("frequency_penalty is invalid")
 
     return Config(
+        url=url,
         api_key=api_key,
         model=model,
+        use_chat_api=use_chat_api,
         temperature=temperature,
         top_p=top_p,
         max_tokens=max_tokens,
@@ -184,8 +240,12 @@ def main() -> None:
         if error.code == 400 or error.code == 401:
             message = get_error_message(error)
             sys.exit('Neural error: OpenAI request failure: ' + message)
+        if error.code == 404:
+            message = get_error_message(error)
+            sys.exit('Neural error: OpenAI request failure: ' + message)
         elif error.code == 429:
-            sys.exit("Neural error: OpenAI request limit reached!")
+            message = get_error_message(error)
+            sys.exit("Neural error: OpenAI request limit reached: " + message)
         else:
             raise
 

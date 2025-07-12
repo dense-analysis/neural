@@ -2,35 +2,47 @@
 
 set -eu
 
+docker_flags=(--rm -w /testplugin -v "$PWD/test:/home")
+# Mount most directories, but definitely not .venv!
+for filename in *; do
+    if \
+        [ "$filename" != run-tests ] \
+        && [ "$filename" != Dockerfile ] \
+        && [[ "$filename" != *.md ]] \
+    ;then
+        docker_flags+=("-v" "$PWD/$filename:/testplugin/$filename")
+    fi
+done
+docker_flags+=("$DOCKER_RUN_IMAGE")
+# We can just use the virtualenv executables as PATH only, we only need those.
+# We can just set src only as PYTHONPATH, our code is there.
+docker_flags+=(env PATH=/root/.venv/bin PYTHONPATH=src)
+
 exit_code=0
-
-docker_flags=(--rm -v "$PWD:/testplugin" -w /testplugin "$DOCKER_RUN_IMAGE")
-
-echo '========================================'
-echo 'Running Python checks'
-echo '========================================'
-echo 'tox warnings/errors follow:'
-echo
-
-# Use a different tox directory if running outside of docker to avoid issues
-# with the docker mounted directory writing as root, and other differences.
-if [ "$NO_DOCKER" -eq 1 ]; then
-    tox_dir=.tox
-else
-    tox_dir=.tox-docker
-fi
-
-tox_command="tox --workdir $tox_dir --skip-missing-interpreters=false"
 
 set -o pipefail
 
-if [ "$NO_DOCKER" -ne 1 ]; then
-    # shellcheck disable=2086
-    docker run -a stdout "${docker_flags[@]}" $tox_command || exit_code=$?
-else
-    $tox_command || exit_code=$?
-fi
+echo '========================================'
+echo 'Running pytest'
+echo '========================================'
+echo 'pytest warnings/errors follow:'
+echo
 
-set +o pipefail
+docker run -a stdout "${docker_flags[@]}" pytest || exit_code=$?
+
+echo '========================================'
+echo 'Running pyright'
+echo '========================================'
+echo 'pyright warnings/errors follow:'
+echo
+
+docker run -a stdout "${docker_flags[@]}" pyright || exit_code=$?
+
+echo '========================================'
+echo 'Running ruff'
+echo '========================================'
+echo 'ruff warnings/errors follow:'
+echo
+docker run -a stdout "${docker_flags[@]}" ruff check -q || exit_code=$?
 
 exit $exit_code

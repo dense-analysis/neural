@@ -5,4 +5,4 @@ Execute(The OpenAI source Dictionary should be correct):
   \   'script_language': 'python',
   \   'script': neural#GetScriptDir() . '/openai.py'
   \ },
-  \ neural#source#openai#Get()
+  \ neural#provider#openai#Get()

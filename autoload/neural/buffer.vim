@@ -1,6 +1,6 @@
 " Author: Anexon <anexon@protonmail.com>
 " Description: A Neural Scratch Buffer acts as a playground for interacting with
-" Neural providers directly, sending all content of the buffer to the source.
+" Neural providers directly, sending all content of the buffer to the provider.
 
 scriptencoding utf-8
 
@@ -9,7 +9,7 @@ call neural#config#Load()
 function! s:GetOptions(options_dict_string) abort
     call neural#config#Load()
 
-    " TODO: Set buffer name based on source.
+    " TODO: Set buffer name based on provider.
     let l:options = {
     \   'name': 'Neural Buffer',
     \   'create_mode': g:neural.buffer.create_mode,
@@ -33,6 +33,8 @@ function! s:GetOptions(options_dict_string) abort
         endif
     endif
 
+    Dump l:options
+
     return l:options
 endfunction
 
@@ -42,6 +44,10 @@ function! neural#buffer#CreateBuffer(options) abort
     " TODO: Add auto incrementing buffer names instead of switching.
     if bufexists(l:buffer_options.name)
         execute 'buffer' bufnr(l:buffer_options.name)
+        setlocal filetype=neuralbuf
+        setlocal buftype=nofile
+        setlocal bufhidden=hide
+        setlocal noswapfile
     else
         if l:buffer_options.create_mode is# 'vertical'
             vertical new

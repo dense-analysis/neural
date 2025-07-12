@@ -91,7 +91,7 @@ Execute():
   \     'neural#job#SendRaw',
   \     1,
   \     json_encode({
-  \       'config': g:neural.source[g:neural.selected],
+  \       'config': g:neural.providers[0],
   \       'prompt': "Explain these lines:\n\nne\nTwo\nThree\nFou",
   \     }) . "\n",
   \   ]

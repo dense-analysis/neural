@@ -28,25 +28,38 @@ RUN apk --update add $PACKAGES && \
     rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
 # Install tools for Python testing.
-ENV PATH /root/.pyenv/shims:/root/.pyenv/bin:$PATH
-# We need --ignore-installed to ignore the `packaging` package version.
-RUN pip install --ignore-installed tox==4.4.5
-RUN curl https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash \
-    && eval "$(pyenv init -)" \
-    && eval "$(pyenv virtualenv-init -)" \
-    && pyenv install 3.7 \
-    && pyenv install 3.10 \
-    && ln -s /root/.pyenv/versions/3.7.*/bin/python3.7 /root/.pyenv/bin/python3.7 \
-    && ln -s /root/.pyenv/versions/3.10.*/bin/python3.10 /root/.pyenv/bin/python3.10
+ENV PATH=/root/.pyenv/shims:/root/.pyenv/bin:$PATH
+
+# Switch to the /root dir copy the .python-version from the project.
+WORKDIR /root
 
 # Install tools for Vim testing.
+# We have a layer here so we rebuild Vim and Neovim less frequently.
+# Installing the Vim versions is the slowest build step.
 RUN install_vim -tag v8.0.0027 -build \
                 -tag v9.0.0297 -build \
                 -tag neovim:v0.8.0 -build
-# Install vint with Python 3.10 to avoid `packaging` issues.
-RUN python3.10 -m pip install vim-vint==0.3.21
 RUN git clone https://github.com/junegunn/vader.vim vader && \
     cd vader && git checkout c6243dd81c98350df4dec608fa972df98fa2a3af
+
+# Copy project files into the project for dependencies and such.
+COPY .python-version /root/
+
+# Install the Python version we need with uv.
+# We have a layer here so we rebuild Python and install uv less frequently.
+# Installing Python with uv is slower than updating dependencies, but much
+# faster than installing the Vim and Neovim versions.
+RUN curl https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash \
+    && eval "$(pyenv init -)" \
+    && eval "$(pyenv virtualenv-init -)" \
+    && pyenv install \
+    && pip install uv
+
+# Sync dependencies and install the Python dependencies we need.
+# vim-vint is included here for running the Vim lint steps.
+# We have a layer here that's very fast.
+COPY pyproject.toml uv.lock /root/
+RUN uv sync --locked --no-install-project
 
 ARG GIT_VERSION
 LABEL Version=${GIT_VERSION}

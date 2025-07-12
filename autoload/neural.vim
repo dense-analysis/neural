@@ -1,8 +1,8 @@
 " Author: Anexon <anexon@protonmail.com>, w0rp <devw0rp@gmail.com>
 " Description: The main autoload file for the Neural Vim plugin
 
-" The location of Neural source scripts
-let s:neural_script_dir = expand('<sfile>:p:h:h') . '/neural_providers'
+" The location of Neural provider scripts
+let s:neural_script_dir = expand('<sfile>:p:h:h') . '/src/neural/provider'
 " Keep track of the current job.
 let s:current_job = get(s:, 'current_job', 0)
 " Keep track of the line the last request happened on.
@@ -117,8 +117,8 @@ function! s:HandleOutputEnd(buffer, job_data, exit_code) abort
 endfunction
 
 " Get the path to the executable for a script language.
-function! s:GetScriptExecutable(source) abort
-    if a:source.script_language is# 'python'
+function! s:GetScriptExecutable(provider) abort
+    if a:provider.script_language is# 'python'
         let l:executable = ''
 
         if has('win32')
@@ -133,7 +133,7 @@ function! s:GetScriptExecutable(source) abort
         return l:executable
     endif
 
-    throw 'Unknown script language: ' . a:source.script_language
+    throw 'Unknown script language: ' . a:provider.script_language
 endfunction
 
 " Escape a string suitably for each platform.
@@ -234,29 +234,26 @@ function! neural#PreProcess(buffer, input) abort
     endfor
 endfunction
 
-function! s:LoadDataSource() abort
-    let l:selected = g:neural.selected
+function! s:LoadProvider() abort
+    " TODO: Change message if nothing is selected.
+    let l:config = get(g:neural.providers, 0, {})
+    let l:type = get(l:config, 'type', '')
 
     try
-        let l:source = function('neural#source#' . selected . '#Get')()
+        let l:provider = function('neural#provider#' . l:type . '#Get')()
     catch /E117/
-        call neural#OutputErrorMessage('Invalid source: ' . l:selected)
+        call neural#OutputErrorMessage('Invalid provider: ' . l:type)
 
         return
     endtry
 
-    return l:source
+    let l:provider.config = config
+
+    return l:provider
 endfunction
 
-function! s:GetSourceInput(buffer, source, prompt) abort
-    let l:config = get(g:neural.source, a:source.name, {})
-
-    " If the config is not a Dictionary, throw it away.
-    if type(l:config) isnot v:t_dict
-        let l:config = {}
-    endif
-
-    let l:input = {'config': l:config, 'prompt': a:prompt}
+function! s:GetProviderInput(buffer, provider, prompt) abort
+    let l:input = {'config': a:provider.config, 'prompt': a:prompt}
 
     " Pre-process input, such as modifying a prompt.
     call neural#PreProcess(a:buffer, l:input)
@@ -265,13 +262,13 @@ function! s:GetSourceInput(buffer, source, prompt) abort
 endfunction
 
 function! neural#GetCommand(buffer) abort
-    let l:source = s:LoadDataSource()
-    let l:script_exe = s:GetScriptExecutable(l:source)
+    let l:provider = s:LoadProvider()
+    let l:script_exe = s:GetScriptExecutable(l:provider)
     let l:command = neural#Escape(l:script_exe)
-    \   . ' ' . neural#Escape(l:source.script)
+    \   . ' ' . neural#Escape(l:provider.script)
     let l:command = neural#job#PrepareCommand(a:buffer, l:command)
 
-    return [l:source, l:command]
+    return [l:provider, l:command]
 endfunction
 
 function! neural#Prompt(prompt) abort
@@ -300,8 +297,8 @@ function! neural#ViewPrompt(...) abort
     " Take the first argument or nothing.
     let l:prompt = get(a:000, 0, '')
     let l:buffer = bufnr('')
-    let l:source = s:LoadDataSource()
-    let l:input = s:GetSourceInput(l:buffer, l:source, l:prompt)
+    let l:provider = s:LoadProvider()
+    let l:input = s:GetProviderInput(l:buffer, l:provider, l:prompt)
 
     " no-custom-checks
     echohl Question
@@ -330,7 +327,7 @@ function! neural#Run(prompt, options) abort
         let l:moving_line -= 1
     endif
 
-    let [l:source, l:command] = neural#GetCommand(l:buffer)
+    let [l:provider, l:command] = neural#GetCommand(l:buffer)
     let l:job_data = {
     \   'moving_line': l:moving_line,
     \   'error_lines': [],
@@ -344,10 +341,10 @@ function! neural#Run(prompt, options) abort
     \})
 
     if l:job_id > 0
-        let l:input = s:GetSourceInput(l:buffer, l:source, a:prompt)
+        let l:input = s:GetProviderInput(l:buffer, l:provider, a:prompt)
         call neural#job#SendRaw(l:job_id, json_encode(l:input) . "\n")
     else
-        call neural#OutputErrorMessage('Failed to run ' . l:source.name)
+        call neural#OutputErrorMessage('Failed to run ' . l:provider.name)
 
         return
     endif

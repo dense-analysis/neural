@@ -3,10 +3,24 @@
 set -e
 set -u
 
-required_version='0.3.21'
+docker_flags=(--rm -w /testplugin -v "$PWD/test:/home")
+# Mount most directories, but definitely not .venv!
+for filename in *; do
+    if \
+        [ "$filename" != run-tests ] \
+        && [ "$filename" != Dockerfile ] \
+        && [[ "$filename" != *.md ]] \
+    ;then
+        docker_flags+=("-v" "$PWD/$filename:/testplugin/$filename")
+    fi
+done
+docker_flags+=("$DOCKER_RUN_IMAGE")
+# We can just use the virtualenv executables as PATH only, we only need those.
+docker_flags+=(env PATH=/root/.venv/bin)
+
+set -o pipefail
 
 exit_code=0
-docker_flags=(--rm -v "$PWD:/testplugin" -v "$PWD/test:/home" -w /testplugin "$DOCKER_RUN_IMAGE")
 
 echo '========================================'
 echo 'Running Vint to lint our code'
@@ -14,22 +28,7 @@ echo '========================================'
 echo 'Vint warnings/errors follow:'
 echo
 
-vint='/root/.pyenv/versions/3.10.10/bin/vint'
-
-set -o pipefail
-
-if [ "$NO_DOCKER" -ne 1 ]; then
-    docker run -a stdout "${docker_flags[@]}" "$vint" -s autoload plugin || exit_code=$?
-else
-    if [ "$(vint --version)" != "$required_version" ]; then
-        echo "You have have vint $(vint --version), but you need $required_version" 1>&2
-        exit 1
-    fi
-
-    vint -s autoload plugin || exit_code=$?
-fi
-
-set +o pipefail
+docker run -a stdout "${docker_flags[@]}" vint -s autoload plugin || exit_code=$?
 
 echo
 

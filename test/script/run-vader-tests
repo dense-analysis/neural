@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
+set -eu
 
-docker_flags=(--rm -v "$PWD:/testplugin" -v "$PWD/test:/home" -w /testplugin "$DOCKER_RUN_IMAGE")
+docker_flags=(--rm -w /testplugin -v "$PWD/test:/home")
+# Mount most directories, but definitely not .venv!
+for filename in *; do
+    if \
+        [ "$filename" != run-tests ] \
+        && [ "$filename" != Dockerfile ] \
+        && [[ "$filename" != *.md ]] \
+    ;then
+        docker_flags+=("-v" "$PWD/$filename:/testplugin/$filename")
+    fi
+done
+docker_flags+=("$DOCKER_RUN_IMAGE")
+
 red='\033[0;31m'
 green='\033[0;32m'
 nc='\033[0m'

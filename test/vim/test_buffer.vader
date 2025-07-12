@@ -21,27 +21,27 @@ After:
 
   Restore
 
+  " Clean up any buffers run during tests.
+  silent! bdelete! 'Neural Buffer'
+  silent! bdelete! 'Test Neural Buffer Name'
+
 Execute(It should create a neural buffer with default settings):
   NeuralBuffer
 
-  AssertEqual bufexists('Neural Buffer'), 1
-  AssertEqual &filetype, 'neuralbuf'
+  AssertEqual 1, bufexists('Neural Buffer')
+  AssertEqual 'neuralbuf', &filetype
   " TODO: Assert if created with new or vertical new
-  AssertEqual &l:wrap, 1
-  AssertEqual &l:linebreak, 1
-
-  bdelete! Neural Buffer
+  AssertEqual 1, &l:wrap
+  AssertEqual 1, &l:linebreak
 
 Execute(It should create a neural buffer with arguments):
-  NeuralBuffer {"name": "Test Name", "create_mode": "horizontal", "wrap": v:false}
+  NeuralBuffer {"name": "Test Neural Buffer Name", "create_mode": "horizontal", "wrap": v:false}
 
-  AssertEqual bufexists('Test Name'), 1
-  AssertEqual &filetype, 'neuralbuf'
+  AssertEqual 1, bufexists('Test Neural Buffer Name')
+  AssertEqual 'neuralbuf', &filetype
   " TODO: Assert if created with new or vertical new
-  AssertEqual &l:wrap, 0
-  AssertEqual &l:linebreak, 0
-
-  bdelete! Test Name
+  AssertEqual 0, &l:wrap
+  AssertEqual 0, &l:linebreak
 
 Given neuralbuf(A Neural buffer):
   write a story
@@ -53,7 +53,6 @@ Execute(It should correctly run neural):
   \   ['neural#Run', 'write a story', {'line': 1, 'echo': 0}],
   \ ],
   \ g:calls
-
 
 " Plug mappings
 Execute(The correct neural buffer keybinds should be configured):

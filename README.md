@@ -4,7 +4,8 @@
 
 A Neovim/Vim coding agent plugin. Neural integrates various machine learning
 tools so you can let AI write code for you in Neovim/Vim, among other helpful
-things. Use OpenAI's APIs made famous with ChatGPT, in Vim.
+things. Use OpenAI's APIs made famous with ChatGPT, in Vim, or other local
+models.
 
 ## 🌟 Features
 
@@ -20,8 +21,7 @@ Experience lightning-fast code generation and completion with asynchronous
 streaming.
 
 Edit any kind of text document. It can be used to generate Python docstrings,
-fix comments spelling/grammar mistakes, generate ideas and much more. See
-[examples from OpenAI](https://beta.openai.com/examples) for a start.
+fix comments spelling/grammar mistakes, generate ideas and much more.
 
 ## 🔌 Plugin Integrations
 
@@ -82,21 +82,8 @@ interact with. OpenAI is Neural's default data provider, and one of the easiest
 to configure.
 
 You will need to obtain an [OpenAI API key](https://beta.openai.com/signup/).
-Once you have your key, configure Neural to use that key, whether in a Vim
-script or in a Lua config.
-
-```vim
-" Configure Neural like so in Vimscript
-let g:neural = {
-\   'providers': [
-\       {
-\           'openai': {
-\               'api_key': $OPENAI_API_KEY,
-\           },
-\       },
-\   ],
-\}
-```
+Once you have your key, configure Neural to use that key, whether in a Lua
+config or in Vimscript.
 
 ```lua
 -- Configure Neural like so in Lua
@@ -111,9 +98,51 @@ require('neural').setup({
 })
 ```
 
+```vim
+" Configure Neural like so in Vimscript
+let g:neural = {
+\   'providers': [
+\       {
+\           'openai': {
+\               'api_key': $OPENAI_API_KEY,
+\           },
+\       },
+\   ],
+\}
+```
+
 Try typing `:Neural say hello`, and if all goes well the machine learning
 tool will say "hello" to you in the current buffer. Type `:help neural` to
 see the full documentation.
+
+You can configure the `url` for an OpenAI provider to run Neural with local
+models or other servers that offer an OpenAI compatible API, for example:
+
+```lua
+-- Configure Neural like so in Lua
+require('neural').setup({
+    providers = {
+        {
+            openai = {
+                url = 'http://localhost:7860',
+            },
+        },
+    },
+})
+```
+
+```vim
+" Configure Neural like so in Vimscript
+let g:neural = {
+\   'providers': [
+\       {
+\           'openai': {
+\               'url': 'http://localhost:7860',
+\           },
+\       },
+\   ],
+\}
+```
 
 ## 🛠️ Commands
 

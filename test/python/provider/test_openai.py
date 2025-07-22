@@ -11,9 +11,13 @@ import pytest
 from neural.provider import openai
 
 
-def get_valid_config(model: str = "foo") -> dict[str, Any]:
+def get_valid_config(
+    model: str = "foo",
+    *,
+    api_key: str = '.',
+) -> dict[str, str | int]:
     return {
-        "api_key": ".",
+        "api_key": api_key,
         "model": model,
         "prompt": "say hello",
         "temperature": 1,
@@ -35,8 +39,7 @@ def test_load_config_errors() -> None:
     for modification, expected_error in [
         ({"url": 1}, "url must be a string"),
         ({"url": "x"}, "url must start with http(s)://"),
-        ({"url": "https://x", "api_key": ""}, "api_key is not defined"),
-        ({"api_key": "."}, "model is not defined"),
+        ({"url": "https://x"}, "model is not defined"),
         ({"model": ""}, "model is not defined"),
         (
             {"model": "x", "use_chat_api": 1},
@@ -124,6 +127,41 @@ def test_main_function_rate_other_error() -> None:
 
         with pytest.raises(urllib.error.HTTPError):
             openai.main()
+
+
+@pytest.mark.parametrize(['api_key', 'expected_headers'], [
+    pytest.param(
+        'sk-fake',
+        {
+            'Authorization': 'Bearer sk-fake',
+            'Content-type': 'application/json',
+        },
+        id='authenticated',
+    ),
+    pytest.param(
+        '',
+        {'Content-type': 'application/json'},
+        id='unauthenticated',
+    ),
+])
+def test_openai_authentication(
+    api_key: str,
+    expected_headers: dict[str, str],
+) -> None:
+    result_data = b'data: [DONE]\n\n'
+
+    with mock.patch.object(sys.stdin, 'readline') as readline_mock, \
+        mock.patch.object(urllib.request, 'urlopen') as urlopen_mock:
+
+        urlopen_mock.return_value.__enter__.return_value = BytesIO(result_data)
+
+        readline_mock.return_value = json.dumps({
+            "config": get_valid_config(api_key=api_key),
+            "prompt": "hello there",
+        })
+        openai.main()
+
+        assert urlopen_mock.mock_calls[0][1][0].headers == expected_headers
 
 
 def test_print_openai_completion_results() -> None:

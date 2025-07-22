@@ -367,6 +367,15 @@ use_chat_api                              *neural-provider-openai.use_chat_api*
   newer models may only run with the chat API.
 
 
+url                                                *neural-provider-openai.url*
+  Type: |String|
+  Default: `'https://api.openai.com'`
+
+  For configuring the API URL to send LLM requests to. This URL can be
+  configured to connect Neural to other models with OpenAI compatible APIs
+  such as DeepSeek, Qwen, etc.
+
+
 -------------------------------------------------------------------------------
 4.4 Highlights                                              *neural-highlights*
 

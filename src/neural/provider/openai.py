@@ -47,8 +47,11 @@ def get_openai_completion(
 ) -> None:
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {config.api_key}",
     }
+
+    if config.api_key:
+        headers["Authorization"] = f"Bearer {config.api_key}"
+
     data: dict[str, Any] = {
         "model": config.model,
         "temperature": config.temperature,
@@ -137,8 +140,8 @@ def load_config(raw_config: dict[str, Any]) -> Config:
 
     api_key = raw_config.get('api_key')
 
-    if not isinstance(api_key, str) or not api_key:  # type: ignore
-        raise ValueError("api_key is not defined")
+    if not isinstance(api_key, str | None):  # type: ignore
+        raise ValueError(f"api_key is an invalid type: {type(api_key)}")
 
     model = raw_config.get('model')
 
@@ -191,7 +194,7 @@ def load_config(raw_config: dict[str, Any]) -> Config:
 
     return Config(
         url=url,
-        api_key=api_key,
+        api_key=api_key or '',
         model=model,
         use_chat_api=use_chat_api,
         temperature=temperature,

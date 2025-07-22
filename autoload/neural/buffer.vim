@@ -33,8 +33,6 @@ function! s:GetOptions(options_dict_string) abort
         endif
     endif
 
-    Dump l:options
-
     return l:options
 endfunction
 

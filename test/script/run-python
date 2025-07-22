@@ -43,6 +43,7 @@ echo 'Running ruff'
 echo '========================================'
 echo 'ruff warnings/errors follow:'
 echo
+
 docker run -a stdout "${docker_flags[@]}" ruff check -q || exit_code=$?
 
 exit $exit_code

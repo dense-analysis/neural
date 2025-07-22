@@ -28,6 +28,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "setuptools",
     "pyright==1.1.402",
     "pytest>=8.4.1",
     "ruff==0.10.0",
